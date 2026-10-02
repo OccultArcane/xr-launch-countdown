@@ -10,7 +10,7 @@ const SOCIALS = [
   { name: "GitHub", abbr: "GH", domain: "github.com" },
 ];
 
-function FaviconLink({
+export function FaviconLink({
   name,
   abbr,
   domain,
@@ -30,24 +30,22 @@ function FaviconLink({
       rel="noopener noreferrer"
       title={name}
       aria-label={name}
-      className="group flex h-6 w-6 items-center justify-center rounded-[4px] opacity-75 outline-none transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:ring-white/50"
+      className="group flex h-5 w-5 items-center justify-center opacity-80 outline-none transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:ring-white/50"
     >
       {failed ? (
-        <span className="flex h-6 w-6 items-center justify-center rounded-[4px] border border-white/15 text-[8px] tracking-tight text-neutral-400 transition-colors group-hover:border-white/40 group-hover:text-neutral-100">
+        <span className="flex h-5 w-5 items-center justify-center rounded-[3px] border border-white/20 text-[6px] tracking-tight text-neutral-400 transition-colors group-hover:border-white/50 group-hover:text-neutral-100">
           {abbr}
         </span>
       ) : (
-        <span className="flex h-6 w-6 items-center justify-center rounded-[4px] bg-white/90 transition-colors group-hover:bg-white">
-          <img
-            src={icon}
-            alt=""
-            width={14}
-            height={14}
-            loading="lazy"
-            onError={() => setFailed(true)}
-            className="h-3.5 w-3.5 grayscale transition group-hover:grayscale-0"
-          />
-        </span>
+        <img
+          src={icon}
+          alt=""
+          width={20}
+          height={20}
+          loading="lazy"
+          onError={() => setFailed(true)}
+          className="h-5 w-5 rounded-[3px] bg-white p-[3px] object-contain grayscale transition group-hover:grayscale-0"
+        />
       )}
     </a>
   );

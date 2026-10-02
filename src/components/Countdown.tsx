@@ -1,30 +1,25 @@
 import { useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "xr:launch-date";
-const DEFAULT_TARGET = "2027-01-01T00:00";
-
-function isValidDate(value: string) {
-  return !Number.isNaN(new Date(value).getTime());
-}
-
-function readStoredTarget(): string {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored && isValidDate(stored)) return stored;
-  } catch {
-    // localStorage unavailable — fall through to the default target.
-  }
-  return DEFAULT_TARGET;
-}
+/** The drop opens every Friday (5 = Friday, 0 = Sunday). */
+const DROP_WEEKDAY = 5;
+/** Local hour the drop opens. */
+const DROP_HOUR = 0;
 
 const pad = (n: number) => String(Math.max(0, n)).padStart(2, "0");
 
+/** Timestamp of the next drop: DROP_WEEKDAY at DROP_HOUR, local time. */
+function nextDrop(now: number): number {
+  const date = new Date(now);
+  date.setHours(DROP_HOUR, 0, 0, 0);
+  date.setDate(date.getDate() + ((DROP_WEEKDAY - date.getDay() + 7) % 7));
+  return date.getTime();
+}
+
 /**
- * Counts down to a launch date the visitor can set themselves.
- * The chosen target is kept in localStorage so it survives reloads.
+ * Counts down to the weekly drop, which lands every Friday at DROP_HOUR.
+ * The target is derived from the clock, so it rolls over on its own.
  */
 export function Countdown() {
-  const [target, setTarget] = useState<string>(readStoredTarget);
   const [now, setNow] = useState<number>(() => Date.now());
 
   useEffect(() => {
@@ -32,29 +27,17 @@ export function Countdown() {
     return () => window.clearInterval(id);
   }, []);
 
-  const targetTime = useMemo(() => {
-    const time = new Date(target).getTime();
-    return Number.isNaN(time) ? null : time;
-  }, [target]);
-
-  const remaining = targetTime !== null ? Math.max(0, targetTime - now) : 0;
+  const target = useMemo(() => nextDrop(now), [now]);
+  const remaining = Math.max(0, target - now);
   const totalSeconds = Math.floor(remaining / 1000);
   const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  const launched = targetTime !== null && remaining <= 0;
+  const dropDay = remaining <= 0;
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    if (!value || !isValidDate(value)) return;
-    setTarget(value);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, value);
-    } catch {
-      // Ignore storage failures — the countdown still runs for this session.
-    }
-  };
+  const dropDate = new Date(target);
+  const dateLabel = `${dropDate.getFullYear()}-${pad(dropDate.getMonth() + 1)}-${pad(dropDate.getDate())} · ${pad(dropDate.getHours())}:${pad(dropDate.getMinutes())}`;
 
   const units: Array<[string, number]> = [
     ["days", days],
@@ -64,13 +47,13 @@ export function Countdown() {
   ];
 
   return (
-    <section
-      aria-label="launch countdown"
-      className="w-full max-w-3xl scroll-m-24"
-    >
-      <p className="mb-5 text-[10px] uppercase tracking-[0.35em] text-neutral-500">
-        {launched ? "launched" : "launch countdown"}
-      </p>
+    <section aria-label="drop countdown" className="w-full max-w-3xl">
+      <div className="mb-5 flex items-baseline justify-between text-[10px] uppercase tracking-[0.35em]">
+        <span className="text-neutral-400">
+          {dropDay ? "drop day" : "next drop"}
+        </span>
+        <span className="tabular-nums text-neutral-500">{dateLabel}</span>
+      </div>
 
       <div className="grid grid-cols-4 border-y border-white/10">
         {units.map(([label, value], index) => (
@@ -89,23 +72,6 @@ export function Countdown() {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-        <label
-          htmlFor="launch-date"
-          className="text-[10px] uppercase tracking-[0.35em] text-neutral-500"
-        >
-          countdown target
-        </label>
-        <input
-          id="launch-date"
-          type="datetime-local"
-          value={target}
-          onChange={handleChange}
-          style={{ colorScheme: "dark" }}
-          className="border border-white/15 bg-transparent px-3 py-2 font-mono text-xs tracking-wide text-neutral-200 outline-none transition-colors hover:border-white/30 focus:border-white/60"
-        />
       </div>
     </section>
   );
