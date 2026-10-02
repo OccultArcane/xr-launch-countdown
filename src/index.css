@@ -174,3 +174,20 @@
     animation: xr-glitch 0.8s steps(3, end) infinite;
   }
 }
+
+/* ── Pulsing NEW dot ──────────────────────────────────────────── */
+@keyframes xr-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .blink-dot {
+    animation: xr-blink 1.4s ease-in-out infinite;
+  }
+}

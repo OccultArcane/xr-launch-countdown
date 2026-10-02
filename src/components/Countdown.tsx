@@ -42,7 +42,7 @@ export function Countdown() {
   const dropDay = new Date(now).getDay() === DROP_WEEKDAY;
 
   const dropDate = new Date(target);
-  const dateLabel = `${dropDate.getFullYear()}-${pad(dropDate.getMonth() + 1)}-${pad(dropDate.getDate())} · ${pad(dropDate.getHours())}:${pad(dropDate.getMinutes())}`;
+  const dateLabel = `${dropDate.getFullYear()}-${pad(dropDate.getMonth() + 1)}-${pad(dropDate.getDate())}`;
 
   const units: Array<[string, number]> = [
     ["days", days],

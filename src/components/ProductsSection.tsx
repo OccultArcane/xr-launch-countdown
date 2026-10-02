@@ -12,7 +12,7 @@ function Tile({ product }: { product: Product }) {
       <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] sm:text-[9px]">
         <span className="flex items-center gap-1.5 text-neutral-300">
           <span
-            className="h-1.5 w-1.5 rounded-full bg-[#f84848]"
+            className="blink-dot h-1.5 w-1.5 rounded-full bg-[#f84848]"
             aria-hidden="true"
           />
           new
@@ -70,13 +70,6 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
       transition={{ duration: 0.7, ease: "easeOut" }}
       className="w-full scroll-m-24"
     >
-      <div className="mb-6 flex items-baseline justify-between text-[10px] uppercase tracking-[0.35em] text-neutral-500">
-        <span>new products</span>
-        <span className="tabular-nums">
-          {String(PRODUCTS.length).padStart(2, "0")} items
-        </span>
-      </div>
-
       <div className="flex w-full flex-col items-center gap-8 lg:flex-row lg:items-center lg:gap-6">
         {hasProducts && (
           <Stack items={left} className="order-1 hidden lg:grid" />
