@@ -24,24 +24,26 @@ export default function Landing() {
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-14 sm:gap-16">
           <h1 className="sr-only">xr — IMVU storefront</h1>
 
-          {/* The mark flanked by the catalog, two tiles a side */}
-          <MarkWithProducts>
-            <BinaryMark
-              text={SITE.maskText}
-              imageSrc={SITE.maskImage || undefined}
-              fallbackImageSrc={SITE.maskImageFallback || undefined}
-            />
-          </MarkWithProducts>
+          {/* Mark, catalog and countdown kept tight together */}
+          <div className="flex w-full flex-col items-center gap-6 sm:gap-8">
+            <MarkWithProducts>
+              <BinaryMark
+                text={SITE.maskText}
+                imageSrc={SITE.maskImage || undefined}
+                fallbackImageSrc={SITE.maskImageFallback || undefined}
+              />
+            </MarkWithProducts>
 
-          {/* Countdown to the weekly Friday drop */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
-            className="w-full max-w-3xl"
-          >
-            <Countdown />
-          </motion.div>
+            {/* Countdown to the weekly Friday drop */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+              className="w-full max-w-3xl"
+            >
+              <Countdown />
+            </motion.div>
+          </div>
 
           {/* Support — direct social channels */}
           <motion.nav
