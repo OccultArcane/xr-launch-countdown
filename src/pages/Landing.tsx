@@ -20,7 +20,7 @@ export default function Landing() {
     <div className="flex min-h-screen flex-col bg-[#0a0a0a] font-mono text-neutral-100 selection:bg-neutral-100 selection:text-[#0a0a0a]">
       <SiteHeader />
 
-      <main className="flex flex-1 items-center justify-center px-6 py-14">
+      <main className="flex flex-1 items-center justify-center px-6 py-6">
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-14 sm:gap-16">
           <h1 className="sr-only">xr — IMVU storefront</h1>
 

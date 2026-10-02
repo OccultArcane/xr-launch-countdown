@@ -18,7 +18,7 @@ export default function ProductDetail() {
     <div className="flex min-h-screen flex-col bg-[#0a0a0a] font-mono text-neutral-100 selection:bg-neutral-100 selection:text-[#0a0a0a]">
       <SiteHeader />
 
-      <main className="flex flex-1 items-start justify-center px-6 py-14">
+      <main className="flex flex-1 items-start justify-center px-6 py-6">
         <div className="mx-auto w-full max-w-3xl">
           {!product ? (
             <div className="py-24 text-center">
