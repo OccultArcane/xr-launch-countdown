@@ -1,0 +1,39 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1024"
+  height="1024"
+  viewBox="0 0 1024 1024"
+  role="img"
+  aria-label="xr gothic monogram"
+>
+  <!-- Interim stand-in silhouette for the binary mark mask.
+       Replace with the real artwork saved as public/xr-mask.png. -->
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+    <!-- x: upper-left through the crossing into the lower-right foot -->
+    <path d="M250 308 C304 372 344 434 376 500 C414 574 466 646 520 710" stroke-width="92" />
+    <!-- x: upper-right through the crossing into the lower-left -->
+    <path d="M487 300 C446 372 406 438 376 500 C346 564 302 626 260 676" stroke-width="88" />
+    <!-- x: whip tail curling off the lower-left -->
+    <path d="M268 660 C238 702 212 734 198 762" stroke-width="22" />
+    <!-- r: stem -->
+    <path d="M616 320 C602 450 606 590 634 706" stroke-width="96" />
+    <!-- r: shoulder reaching for the diamond -->
+    <path d="M640 340 C696 314 734 320 764 356" stroke-width="62" />
+    <!-- r: foot sweeping off the stem base -->
+    <path d="M640 690 C672 722 700 742 726 752" stroke-width="54" />
+  </g>
+  <g fill="#ffffff">
+    <!-- x: upper-left flag -->
+    <polygon points="250,246 312,308 250,370 188,308" />
+    <!-- x: upper-right diamond -->
+    <polygon points="487,236 551,300 487,364 423,300" />
+    <!-- x: lower-right foot diamond -->
+    <polygon points="516,646 576,706 516,766 456,706" />
+    <!-- r: stem-top flag -->
+    <polygon points="592,268 636,312 592,356 548,312" />
+    <!-- r: terminal diamond -->
+    <polygon points="798,274 864,340 798,406 732,340" />
+    <!-- r: foot point -->
+    <polygon points="700,706 752,744 716,798 664,760" />
+  </g>
+</svg>

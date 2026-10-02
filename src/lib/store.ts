@@ -20,6 +20,11 @@ export const SITE = {
    * background) and point this at it; leave "" to fall back to maskText.
    */
   maskImage: "/xr-mask.png",
+  /**
+   * Stand-in silhouette used until maskImage exists, so the mark always
+   * masks to the gothic xr shape.
+   */
+  maskImageFallback: "/xr-mask-fallback.svg",
   /** Your IMVU store URL — used as the fallback link on a product page. */
   storeUrl: "https://www.imvu.com/store/",
 };

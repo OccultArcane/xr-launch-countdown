@@ -40,6 +40,8 @@ type BinaryMarkProps = {
   text?: string;
   /** Logo image used as the mask (transparent PNG or shape on flat bg). */
   imageSrc?: string;
+  /** Tried when `imageSrc` is missing or fails to load. */
+  fallbackImageSrc?: string;
 };
 
 /**
@@ -47,7 +49,11 @@ type BinaryMarkProps = {
  * silhouette: digits flicker, flip and occasionally flash red, all kept
  * inside the masked shape.
  */
-export function BinaryMark({ text = "xr", imageSrc }: BinaryMarkProps) {
+export function BinaryMark({
+  text = "xr",
+  imageSrc,
+  fallbackImageSrc,
+}: BinaryMarkProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -231,9 +237,11 @@ export function BinaryMark({ text = "xr", imageSrc }: BinaryMarkProps) {
       cell = width < 560 ? 12 : width < 900 ? 14 : 15;
 
       let mask: Mask | null = null;
-      if (imageSrc) {
-        mask = await rasterizeImage(imageSrc);
+      for (const candidate of [imageSrc, fallbackImageSrc]) {
+        if (!candidate) continue;
+        mask = await rasterizeImage(candidate);
         if (id !== buildId) return; // a newer rebuild superseded this one
+        if (mask) break;
       }
       if (!mask) mask = rasterizeText();
 
@@ -370,7 +378,7 @@ export function BinaryMark({ text = "xr", imageSrc }: BinaryMarkProps) {
       window.clearTimeout(resizeTimer);
       cancelAnimationFrame(raf);
     };
-  }, [text, imageSrc]);
+  }, [text, imageSrc, fallbackImageSrc]);
 
   return (
     <div ref={wrapRef} className="relative h-full w-full" aria-hidden="true">

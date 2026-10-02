@@ -35,6 +35,7 @@ export default function Landing() {
             <BinaryMark
               text={SITE.maskText}
               imageSrc={SITE.maskImage || undefined}
+              fallbackImageSrc={SITE.maskImageFallback || undefined}
             />
           </motion.div>
 
