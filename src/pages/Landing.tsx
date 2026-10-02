@@ -1,14 +1,14 @@
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BinaryMark } from "@/components/BinaryMark";
 import { Countdown } from "@/components/Countdown";
 import { MarkWithProducts } from "@/components/ProductsSection";
-import { SiteFooter, SiteHeader, FaviconLink } from "@/components/SiteChrome";
+import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { SITE } from "@/lib/store";
 
 const SUPPORT_SOCIALS = [
-  { name: "Pinterest", abbr: "PIN", domain: "pinterest.com" },
-  { name: "Instagram", abbr: "IG", domain: "instagram.com" },
+  { name: "Pinterest", domain: "pinterest.com" },
+  { name: "Instagram", domain: "instagram.com" },
 ];
 
 export default function Landing() {
@@ -49,10 +49,24 @@ export default function Landing() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-            className="flex items-center gap-3"
+            className="flex flex-wrap items-center justify-center gap-x-3 text-[13px] lowercase tracking-[0.12em]"
           >
-            {SUPPORT_SOCIALS.map((social) => (
-              <FaviconLink key={social.domain} {...social} />
+            {SUPPORT_SOCIALS.map((social, index) => (
+              <Fragment key={social.domain}>
+                {index > 0 && (
+                  <span aria-hidden="true" className="text-neutral-600">
+                    /
+                  </span>
+                )}
+                <a
+                  href={`https://${social.domain}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glitch-hover text-neutral-300 underline-offset-4 transition-colors hover:text-white hover:underline"
+                >
+                  {social.name}
+                </a>
+              </Fragment>
             ))}
           </motion.nav>
         </div>
