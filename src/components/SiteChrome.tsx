@@ -1,5 +1,4 @@
 import { Fragment } from "react";
-import { SITE } from "@/lib/store";
 
 const SOCIALS = [
   { name: "Instagram", domain: "instagram.com" },
@@ -46,9 +45,13 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/10">
-      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-6 text-[10px] uppercase tracking-[0.3em] text-neutral-500">
-        <span>© 2026 {SITE.name}</span>
-        <span>all rights reserved</span>
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-2.5 px-6 py-7 text-center">
+        <p className="text-[9px] tracking-[0.18em] text-[#f84848] sm:text-[11px] sm:tracking-[0.28em]">
+          ALL THEFT WILL RESULT IN DMCA CONSEQUENCES
+        </p>
+        <p className="text-[9px] tracking-[0.24em] text-neutral-500 sm:text-[10px] sm:tracking-[0.3em]">
+          © 2026 ALL RIGHTS RESERVED
+        </p>
       </div>
     </footer>
   );
