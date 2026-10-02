@@ -10,7 +10,14 @@ type Cell = {
   speed: number;
   flipAt: number;
   drift: number;
-  inside: boolean;
+};
+
+type Mask = {
+  data: Uint8ClampedArray;
+  /** True when the mask is defined by alpha (text or a transparent PNG). */
+  transparent: boolean;
+  /** Corner colour used as the background for opaque images. */
+  bg: [number, number, number];
 };
 
 const FONT_FAMILY =
@@ -27,11 +34,18 @@ function styleFor(alpha: number) {
   return STYLES[Math.max(0, Math.min(ALPHA_STEPS, step))];
 }
 
+type BinaryMarkProps = {
+  /** Text the mark spells. Ignored when `imageSrc` loads successfully. */
+  text?: string;
+  /** Optional logo image used as the mask (transparent PNG works best). */
+  imageSrc?: string;
+};
+
 /**
- * The "xr" wordmark drawn as a grid of 0s and 1s. Digits inside the glyph
- * flicker, flip and jitter in place; a sparse ambient field drifts behind them.
+ * The mark drawn as a grid of 0s and 1s: digits inside the mask flicker,
+ * flip and jitter in place, while a sparse ambient field drifts behind.
  */
-export function BinaryMark() {
+export function BinaryMark({ text = "xr", imageSrc }: BinaryMarkProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -51,9 +65,79 @@ export function BinaryMark() {
     let height = 0;
     let cell = 11;
     let raf = 0;
+    let buildId = 0;
     let resizeTimer: number | undefined;
 
-    const build = () => {
+    const makeCanvas = () => {
+      const off = document.createElement("canvas");
+      off.width = width;
+      off.height = height;
+      return off;
+    };
+
+    const rasterizeText = (): Mask => {
+      const off = makeCanvas();
+      const octx = off.getContext("2d", { willReadFrequently: true });
+      if (!octx)
+        return {
+          data: new Uint8ClampedArray(4),
+          transparent: true,
+          bg: [0, 0, 0],
+        };
+
+      octx.fillStyle = "#fff";
+      octx.textAlign = "center";
+      octx.textBaseline = "middle";
+      let fontSize = Math.min(height * 1.02, width * 0.55);
+      octx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
+      const metrics = octx.measureText(text);
+      const maxWidth = width * 0.72;
+      if (metrics.width > maxWidth && metrics.width > 0) {
+        fontSize *= maxWidth / metrics.width;
+        octx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
+      }
+      octx.fillText(text, width / 2, height / 2);
+      return {
+        data: octx.getImageData(0, 0, width, height).data,
+        transparent: true,
+        bg: [0, 0, 0],
+      };
+    };
+
+    const rasterizeImage = async (src: string): Promise<Mask | null> => {
+      const img = await new Promise<HTMLImageElement | null>((resolve) => {
+        const el = new Image();
+        el.onload = () => resolve(el);
+        el.onerror = () => resolve(null);
+        el.src = src;
+      });
+      if (!img || !img.naturalWidth || !img.naturalHeight) return null;
+
+      const off = makeCanvas();
+      const octx = off.getContext("2d", { willReadFrequently: true });
+      if (!octx) return null;
+
+      const scale = Math.min(
+        (width * 0.7) / img.naturalWidth,
+        (height * 0.78) / img.naturalHeight,
+      );
+      const dw = img.naturalWidth * scale;
+      const dh = img.naturalHeight * scale;
+      octx.drawImage(img, (width - dw) / 2, (height - dh) / 2, dw, dh);
+
+      const data = octx.getImageData(0, 0, width, height).data;
+      let transparent = false;
+      for (let i = 3; i < data.length; i += 128) {
+        if (data[i] < 250) {
+          transparent = true;
+          break;
+        }
+      }
+      return { data, transparent, bg: [data[0], data[1], data[2]] };
+    };
+
+    const build = async () => {
+      const id = ++buildId;
       const rect = wrap.getBoundingClientRect();
       width = Math.max(1, Math.round(rect.width));
       height = Math.max(1, Math.round(rect.height));
@@ -65,26 +149,26 @@ export function BinaryMark() {
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Rasterize the wordmark once and sample its alpha channel as a mask.
-      const off = document.createElement("canvas");
-      off.width = width;
-      off.height = height;
-      const octx = off.getContext("2d", { willReadFrequently: true });
-      if (!octx) return;
-
-      octx.fillStyle = "#fff";
-      octx.textAlign = "center";
-      octx.textBaseline = "middle";
-      let fontSize = Math.min(height * 1.02, width * 0.55);
-      octx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
-      const metrics = octx.measureText("xr");
-      const maxWidth = width * 0.72;
-      if (metrics.width > maxWidth && metrics.width > 0) {
-        fontSize *= maxWidth / metrics.width;
-        octx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
+      let mask: Mask | null = null;
+      if (imageSrc) {
+        mask = await rasterizeImage(imageSrc);
+        if (id !== buildId) return; // a newer rebuild superseded this one
       }
-      octx.fillText("xr", width / 2, height / 2);
-      const mask = octx.getImageData(0, 0, width, height).data;
+      if (!mask) mask = rasterizeText();
+
+      const coverage = (px: number, py: number) => {
+        const i = (py * width + px) * 4;
+        const a = mask!.data[i + 3] / 255;
+        if (a <= 0) return 0;
+        if (mask!.transparent) return a;
+        const d =
+          Math.max(
+            Math.abs(mask!.data[i] - mask!.bg[0]),
+            Math.abs(mask!.data[i + 1] - mask!.bg[1]),
+            Math.abs(mask!.data[i + 2] - mask!.bg[2]),
+          ) / 255;
+        return Math.min(1, d * 1.5);
+      };
 
       cell = width < 560 ? 8 : width < 900 ? 10 : 11;
       const next: Cell[] = [];
@@ -94,15 +178,13 @@ export function BinaryMark() {
         for (let gx = cell / 2; gx < width; gx += cell) {
           const px = Math.min(width - 1, Math.floor(gx));
           const py = Math.min(height - 1, Math.floor(gy));
-          const coverage = mask[(py * width + px) * 4 + 3] / 255;
+          const cov = coverage(px, py);
 
           let alpha = 0;
-          let inside = false;
-          if (coverage > 0.55) {
-            inside = true;
+          if (cov > 0.55) {
             alpha = 0.5 + Math.random() * 0.5;
-          } else if (coverage > 0.1) {
-            // Ragged glyph edges: partially filled cells, dimmer.
+          } else if (cov > 0.1) {
+            // Ragged mask edges: partially filled cells, dimmer.
             if (Math.random() < 0.55) alpha = 0.1 + Math.random() * 0.28;
           } else if (Math.random() < 0.05) {
             // Sparse ambient field.
@@ -110,7 +192,7 @@ export function BinaryMark() {
           }
           if (alpha <= 0) continue;
 
-          const anchored = coverage > 0.1;
+          const anchored = cov > 0.1;
           next.push({
             x: gx,
             y: gy,
@@ -121,12 +203,11 @@ export function BinaryMark() {
             speed: 0.35 + Math.random() * 1.1,
             flipAt: reduceMotion ? 0 : now + 500 + Math.random() * 4000,
             drift: anchored ? 0 : 3 + Math.random() * 9,
-            inside,
           });
         }
       }
 
-      // Ambient digits first, wordmark on top.
+      // Ambient digits first, mark on top.
       next.sort((a, b) => Number(a.drift === 0) - Number(b.drift === 0));
       cells = next;
 
@@ -186,7 +267,7 @@ export function BinaryMark() {
       window.clearTimeout(resizeTimer);
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [text, imageSrc]);
 
   return (
     <div ref={wrapRef} className="relative h-full w-full" aria-hidden="true">
