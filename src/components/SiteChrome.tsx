@@ -1,11 +1,9 @@
 import { Fragment } from "react";
 
-const SOCIALS = [
-  { name: "Instagram", domain: "instagram.com" },
-  { name: "Pinterest", domain: "pinterest.com" },
-  { name: "X", domain: "x.com" },
-  { name: "YouTube", domain: "youtube.com" },
-  { name: "GitHub", domain: "github.com" },
+const HEADER_LINKS = [
+  { label: "chokinglotus", href: "#" },
+  { label: "numen", href: "#" },
+  { label: "G59", href: "#" },
 ];
 
 export function SiteHeader() {
@@ -16,23 +14,23 @@ export function SiteHeader() {
           supported creators
         </span>
         <nav
-          aria-label="social links"
-          className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] lowercase tracking-[0.1em] sm:text-[11px] sm:tracking-[0.18em]"
+          aria-label="links"
+          className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] sm:text-[11px] sm:tracking-[0.18em]"
         >
-          {SOCIALS.map((social, index) => (
-            <Fragment key={social.domain}>
+          {HEADER_LINKS.map((link, index) => (
+            <Fragment key={link.label}>
               {index > 0 && (
                 <span aria-hidden="true" className="text-neutral-600">
                   /
                 </span>
               )}
               <a
-                href={`https://${social.domain}`}
+                href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="glitch-hover text-neutral-300 transition-colors hover:text-white"
               >
-                {social.name.toLowerCase()}
+                {link.label}
               </a>
             </Fragment>
           ))}
