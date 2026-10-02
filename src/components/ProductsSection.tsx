@@ -3,25 +3,11 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { PRODUCTS, type Product } from "@/lib/store";
 
-/** Fillers keep each hairline pair closed at two columns. */
-const pairFillers = (count: number) => (2 - (count % 2)) % 2;
-
-function Tile({
-  product,
-  index,
-  fixed,
-}: {
-  product: Product;
-  index: number;
-  fixed?: boolean;
-}) {
+function Tile({ product, index }: { product: Product; index: number }) {
   return (
     <Link
       to={`/products/${product.id}`}
-      className={
-        "group flex aspect-square flex-col bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 " +
-        (fixed ? "w-[136px] xl:w-[148px]" : "")
-      }
+      className="group flex aspect-square w-[144px] flex-col bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]"
     >
       <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] text-neutral-500 sm:text-[9px]">
         <span className="tabular-nums">
@@ -51,7 +37,7 @@ function Tile({
   );
 }
 
-function Pair({
+function Stack({
   items,
   startIndex,
   className,
@@ -63,27 +49,20 @@ function Pair({
   return (
     <div
       className={
-        "grid shrink-0 grid-cols-2 gap-px border border-white/10 bg-white/10 " +
+        "grid shrink-0 grid-cols-1 gap-px border border-white/10 bg-white/10 " +
         className
       }
     >
       {items.map((product, i) => (
-        <Tile key={product.id} product={product} index={startIndex + i} fixed />
-      ))}
-      {Array.from({ length: pairFillers(items.length) }, (_, i) => (
-        <div
-          key={`filler-${i}`}
-          className="aspect-square bg-[#0a0a0a]"
-          aria-hidden="true"
-        />
+        <Tile key={product.id} product={product} index={startIndex + i} />
       ))}
     </div>
   );
 }
 
 /**
- * The catalog beside the mark: two square tiles flanking it on each side on
- * desktop, and a 2×2 block under it on smaller screens.
+ * The catalog beside the mark: square tiles stacked on top of each other —
+ * a column on each side on desktop, one full stack under it on mobile.
  */
 export function MarkWithProducts({ children }: { children: ReactNode }) {
   const mid = Math.ceil(PRODUCTS.length / 2);
@@ -109,7 +88,7 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
 
       <div className="flex w-full flex-col items-center gap-8 lg:flex-row lg:items-center lg:gap-6">
         {hasProducts && (
-          <Pair
+          <Stack
             items={left}
             startIndex={0}
             className="order-1 hidden lg:grid"
@@ -122,22 +101,15 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
         </div>
 
         {hasProducts && (
-          <div className="order-2 grid w-full max-w-sm grid-cols-2 gap-px border border-white/10 bg-white/10 lg:hidden">
+          <div className="order-2 grid w-fit grid-cols-1 gap-px border border-white/10 bg-white/10 lg:hidden">
             {PRODUCTS.map((product, i) => (
               <Tile key={product.id} product={product} index={i} />
-            ))}
-            {Array.from({ length: pairFillers(PRODUCTS.length) }, (_, i) => (
-              <div
-                key={`filler-${i}`}
-                className="aspect-square bg-[#0a0a0a]"
-                aria-hidden="true"
-              />
             ))}
           </div>
         )}
 
         {hasProducts && (
-          <Pair
+          <Stack
             items={right}
             startIndex={left.length}
             className="order-3 hidden lg:grid"
