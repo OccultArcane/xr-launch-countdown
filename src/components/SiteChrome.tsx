@@ -59,7 +59,7 @@ export function SiteHeader() {
           to="/"
           className="text-sm lowercase tracking-[0.4em] text-neutral-200 outline-none transition-colors hover:text-white focus-visible:ring-1 focus-visible:ring-white/50"
         >
-          {SITE.name}
+          support
         </Link>
         <nav aria-label="social links" className="flex items-center gap-2.5">
           {SOCIALS.map((social) => (
