@@ -64,7 +64,7 @@ export default function Landing() {
                   href={`https://${social.domain}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="glitch-hover text-neutral-300 transition-colors hover:text-white"
+                  className="glitch-hover no-underline text-neutral-300 transition-colors hover:text-white"
                 >
                   {social.name}
                 </a>

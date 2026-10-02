@@ -126,6 +126,10 @@
 }
 
 /* ── Glitch hover for links ─────────────────────────────────────────── */
+.glitch-hover {
+  text-decoration: none !important;
+}
+
 @keyframes xr-glitch {
   0%,
   100% {
