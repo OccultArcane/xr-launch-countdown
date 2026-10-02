@@ -1,4 +1,9 @@
-import { useEffect, useRef } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 
 type Cell = {
   x: number;
@@ -35,6 +40,83 @@ function styleFor(alpha: number) {
   return STYLES[Math.max(0, Math.min(ALPHA_STEPS, step))];
 }
 
+type Edges = { l: number; t: number; r: number; b: number };
+
+const EDGE_TOLERANCE = 12;
+
+/**
+ * Peels uniform edges off an image — empty paper margins, screenshot frames,
+ * and both at once — stopping as soon as real artwork appears. Returns null
+ * when the whole image is flat colour.
+ */
+function trimUniformEdges(
+  data: Uint8ClampedArray,
+  w: number,
+  h: number,
+): Edges | null {
+  const limit = Math.floor(Math.min(w, h) * 0.45);
+  const same = (i: number, j: number) =>
+    Math.abs(data[i] - data[j]) <= EDGE_TOLERANCE &&
+    Math.abs(data[i + 1] - data[j + 1]) <= EDGE_TOLERANCE &&
+    Math.abs(data[i + 2] - data[j + 2]) <= EDGE_TOLERANCE &&
+    Math.abs(data[i + 3] - data[j + 3]) <= EDGE_TOLERANCE;
+
+  const columnUniform = (x: number, y0: number, y1: number) => {
+    const start = (y0 * w + x) * 4;
+    for (let y = y0 + 1; y < y1; y += 2) {
+      if (!same(start, (y * w + x) * 4)) return false;
+    }
+    return true;
+  };
+  const rowUniform = (y: number, x0: number, x1: number) => {
+    const start = (y * w + x0) * 4;
+    for (let x = x0 + 1; x < x1; x += 2) {
+      if (!same(start, (y * w + x) * 4)) return false;
+    }
+    return true;
+  };
+
+  let l = 0;
+  while (l < limit && columnUniform(l, 0, h)) l++;
+  let r = 0;
+  while (r < limit && columnUniform(w - 1 - r, 0, h)) r++;
+  let t = 0;
+  while (t < limit && rowUniform(t, l, w - r)) t++;
+  let b = 0;
+  while (b < limit && rowUniform(h - 1 - b, l, w - r)) b++;
+
+  if (w - l - r < 8 || h - t - b < 8) return null;
+  return { l, t, r, b };
+}
+
+/** Most frequent colour in a region — the paper the artwork sits on. */
+function dominantColor(
+  data: Uint8ClampedArray,
+  w: number,
+  left: number,
+  top: number,
+  rw: number,
+  rh: number,
+): [number, number, number] {
+  const counts = new Int32Array(512);
+  let best = 0;
+  for (let y = top; y < top + rh; y += 3) {
+    for (let x = left; x < left + rw; x += 3) {
+      const i = (y * w + x) * 4;
+      const key =
+        ((data[i] >> 5) << 6) | ((data[i + 1] >> 5) << 3) | (data[i + 2] >> 5);
+      counts[key] += 1;
+      if (counts[key] > counts[best]) best = key;
+    }
+  }
+  const level = (shift: number) => ((best >> shift) & 7) * 32 + 16;
+  return [
+    Math.min(255, level(6)),
+    Math.min(255, level(3)),
+    Math.min(255, level(0)),
+  ];
+}
+
 type BinaryMarkProps = {
   /** Text the mark spells. Used when no image is supplied or it fails. */
   text?: string;
@@ -56,6 +138,7 @@ export function BinaryMark({
 }: BinaryMarkProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -75,6 +158,10 @@ export function BinaryMark({
     let raf = 0;
     let buildId = 0;
     let resizeTimer: number | undefined;
+    let glitchUntil = 0;
+    let nextGlitch = 0;
+    const TORN_BAND = 26;
+    const tornBands = new Map<number, number>();
 
     const newCanvas = (w: number, h: number) => {
       const off = document.createElement("canvas");
@@ -142,16 +229,27 @@ export function BinaryMark({
       pctx.drawImage(img, 0, 0, sw, sh);
       const src = pctx.getImageData(0, 0, sw, sh).data;
 
-      // Background colour comes from the very first pixel (a corner).
-      const bg: [number, number, number] = [src[0], src[1], src[2]];
+      // Peel uniform edges first: paper margins and screenshot frames both
+      // strip away until the artwork itself starts.
+      const edges = trimUniformEdges(src, sw, sh);
+      if (!edges) return null; // flat colour — fall back to text
+      const rl = edges.l;
+      const rt = edges.t;
+      const rw = sw - edges.l - edges.r;
+      const rh = sh - edges.t - edges.b;
+
+      // The dominant colour in the artwork region is the paper it sits on.
+      const bg = dominantColor(src, sw, rl, rt, rw, rh);
 
       // Artwork with real holes is masked by alpha; solid pieces (e.g. black
-      // letters on a white tile) are masked by standing out from the corner.
+      // letters on a white tile) are masked by standing out from the paper.
       let opaque = 0;
       let sampled = 0;
-      for (let i = 3; i < src.length; i += 16) {
-        sampled += 1;
-        if (src[i] >= 128) opaque += 1;
+      for (let y = rt; y < rt + rh; y += 4) {
+        for (let x = rl; x < rl + rw; x += 4) {
+          sampled += 1;
+          if (src[(y * sw + x) * 4 + 3] >= 128) opaque += 1;
+        }
       }
       const transparent = sampled === 0 || opaque / sampled < 0.95;
 
@@ -164,7 +262,7 @@ export function BinaryMark({
             Math.abs(src[i + 1] - bg[1]),
             Math.abs(src[i + 2] - bg[2]),
           ) / 255;
-        return d > 0.08;
+        return d > 0.07;
       };
 
       // Find the content's bounding box so empty margins are cropped away.
@@ -172,9 +270,9 @@ export function BinaryMark({
       let minY = sh;
       let maxX = -1;
       let maxY = -1;
-      for (let y = 0; y < sh; y++) {
+      for (let y = rt; y < rt + rh; y++) {
         const row = y * sw;
-        for (let x = 0; x < sw; x++) {
+        for (let x = rl; x < rl + rw; x++) {
           if (!standsOut((row + x) * 4)) continue;
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
@@ -273,8 +371,8 @@ export function BinaryMark({
               Math.abs(mask!.data[i + 1] - mask!.bg[1]),
               Math.abs(mask!.data[i + 2] - mask!.bg[2]),
             ) / 255;
-          // Smooth threshold: paper-white stays out, gloss highlights stay in.
-          total += Math.min(1, Math.max(0, (d - 0.1) / 0.22)) * a;
+          // Smooth threshold: paper stays out, dimmer gloss stays in.
+          total += Math.min(1, Math.max(0, (d - 0.07) / 0.15)) * a;
         }
         return total / probes.length;
       };
@@ -323,6 +421,26 @@ export function BinaryMark({
       ctx.textBaseline = "middle";
       ctx.font = `500 ${Math.round(cell * 1.15)}px ${FONT_FAMILY}`;
 
+      // Periodic glitch burst: torn bands, chromatic split, scrambled digits.
+      let glitching = false;
+      if (!reduceMotion) {
+        if (nextGlitch === 0) nextGlitch = nowMs + 2500 + Math.random() * 5000;
+        if (nowMs >= glitchUntil && nowMs >= nextGlitch) {
+          glitchUntil = nowMs + 260 + Math.random() * 340;
+          nextGlitch = nowMs + 3500 + Math.random() * 5500;
+          tornBands.clear();
+          const bandCount = Math.ceil(height / TORN_BAND);
+          for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
+            const band = Math.floor(Math.random() * bandCount);
+            tornBands.set(
+              band,
+              (Math.random() < 0.5 ? -1 : 1) * (4 + Math.random() * 14),
+            );
+          }
+        }
+        glitching = nowMs < glitchUntil;
+      }
+
       for (const c of cells) {
         if (c.flipAt !== 0 && nowMs > c.flipAt) {
           c.ch = c.ch === "0" ? "1" : "0";
@@ -339,6 +457,15 @@ export function BinaryMark({
           alpha *= 0.72 + 0.28 * Math.sin(t * 1.7 + c.phase * 3);
         }
 
+        if (glitching) {
+          const tear = tornBands.get(Math.floor(y / TORN_BAND));
+          if (tear) x += tear;
+          if (Math.random() < 0.06) {
+            c.ch = c.ch === "0" ? "1" : "0";
+            c.flipAt = nowMs + 400 + Math.random() * 900;
+          }
+        }
+
         // Every so often a single digit flashes red, then fades back.
         let red = false;
         if (c.redAt !== 0) {
@@ -350,6 +477,17 @@ export function BinaryMark({
         }
 
         if (alpha < 0.015) continue;
+
+        if (glitching) {
+          // Chromatic split: red and cyan ghosts either side of the digit.
+          const ghost = Math.min(1, alpha * 0.85).toFixed(3);
+          ctx.fillStyle = `rgba(248,72,72,${ghost})`;
+          ctx.fillText(c.ch, x - 2.5, y);
+          ctx.fillStyle = `rgba(72,220,248,${ghost})`;
+          ctx.fillText(c.ch, x + 2.5, y);
+          if (Math.random() < 0.06) continue; // core dropouts mid-burst
+        }
+
         if (red) {
           ctx.fillStyle = `rgba(248,72,72,${Math.min(1, alpha * 1.3).toFixed(3)})`;
         } else {
@@ -380,9 +518,31 @@ export function BinaryMark({
     };
   }, [text, imageSrc, fallbackImageSrc]);
 
+  // 3D parallax: the stage leans toward the pointer and settles on leave.
+  const handleMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: -py * 9, y: px * 11 });
+  };
+
   return (
-    <div ref={wrapRef} className="relative h-full w-full" aria-hidden="true">
-      <canvas ref={canvasRef} className="block h-full w-full" />
+    <div
+      ref={wrapRef}
+      className="relative h-full w-full"
+      aria-hidden="true"
+      onPointerMove={handleMove}
+      onPointerLeave={() => setTilt({ x: 0, y: 0 })}
+    >
+      <div
+        className="h-full w-full transition-transform duration-200 ease-out will-change-transform"
+        style={{
+          transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        }}
+      >
+        <canvas ref={canvasRef} className="block h-full w-full" />
+      </div>
     </div>
   );
 }

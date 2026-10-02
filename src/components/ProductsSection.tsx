@@ -7,7 +7,7 @@ function Tile({ product, index }: { product: Product; index: number }) {
   return (
     <Link
       to={`/products/${product.id}`}
-      className="group flex aspect-square w-[144px] flex-col bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]"
+      className="glitch-hover group flex aspect-square w-[144px] flex-col bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]"
     >
       <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] text-neutral-500 sm:text-[9px]">
         <span className="tabular-nums">

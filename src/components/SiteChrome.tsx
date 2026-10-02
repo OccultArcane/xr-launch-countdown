@@ -67,7 +67,7 @@ export function FaviconLink({
       rel="noopener noreferrer"
       title={name}
       aria-label={name}
-      className="group flex h-8 w-8 items-center justify-center rounded-[6px] border border-white/15 bg-white/[0.04] opacity-90 outline-none transition hover:border-white/40 hover:opacity-100 focus-visible:ring-1 focus-visible:ring-white/50"
+      className="glitch-hover group flex h-8 w-8 items-center justify-center rounded-[6px] border border-white/15 bg-white/[0.04] opacity-90 outline-none transition hover:border-white/40 hover:opacity-100 focus-visible:ring-1 focus-visible:ring-white/50"
     >
       {failed ? (
         <span className="text-[9px] tracking-tight text-neutral-400">
@@ -96,7 +96,7 @@ export function SiteHeader() {
         <IconOutlineDefs />
         <Link
           to="/"
-          className="whitespace-nowrap text-[10px] lowercase tracking-[0.06em] text-neutral-200 outline-none transition-colors hover:text-white focus-visible:ring-1 focus-visible:ring-white/50 sm:text-sm sm:tracking-[0.35em]"
+          className="glitch-hover whitespace-nowrap text-[10px] lowercase tracking-[0.06em] text-neutral-200 outline-none transition-colors hover:text-white focus-visible:ring-1 focus-visible:ring-white/50 sm:text-sm sm:tracking-[0.35em]"
         >
           supported creators
         </Link>

@@ -34,7 +34,7 @@ export default function ProductDetail() {
               </p>
               <a
                 href="/#products"
-                className="mt-9 inline-block border border-white/20 px-6 py-3.5 text-[11px] uppercase tracking-[0.3em] text-neutral-100 transition-colors hover:border-white hover:bg-white hover:text-[#0a0a0a]"
+                className="glitch-hover mt-9 inline-block border border-white/20 px-6 py-3.5 text-[11px] uppercase tracking-[0.3em] text-neutral-100 transition-colors hover:border-white hover:bg-white hover:text-[#0a0a0a]"
               >
                 ← all products
               </a>
@@ -106,13 +106,13 @@ export default function ProductDetail() {
                   href={product.url || SITE.storeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border border-white/20 px-6 py-3.5 text-[11px] uppercase tracking-[0.3em] text-neutral-100 transition-colors hover:border-white hover:bg-white hover:text-[#0a0a0a]"
+                  className="glitch-hover border border-white/20 px-6 py-3.5 text-[11px] uppercase tracking-[0.3em] text-neutral-100 transition-colors hover:border-white hover:bg-white hover:text-[#0a0a0a]"
                 >
                   open in the imvu store ↗
                 </a>
                 <a
                   href="/#products"
-                  className="text-[11px] uppercase tracking-[0.3em] text-neutral-500 transition-colors hover:text-neutral-200"
+                  className="glitch-hover text-[11px] uppercase tracking-[0.3em] text-neutral-500 transition-colors hover:text-neutral-200"
                 >
                   ← all products
                 </a>
@@ -131,7 +131,7 @@ export default function ProductDetail() {
                       <li key={other.id}>
                         <Link
                           to={`/products/${other.id}`}
-                          className="group flex items-center justify-between gap-4 px-1 py-4 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03]"
+                          className="glitch-hover group flex items-center justify-between gap-4 px-1 py-4 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03]"
                         >
                           <span className="flex min-w-0 items-center gap-4">
                             <span className="shrink-0 text-[10px] tabular-nums tracking-[0.3em] text-neutral-500">
