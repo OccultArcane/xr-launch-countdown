@@ -2,12 +2,19 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { PRODUCTS } from "@/lib/store";
 
+/** Fillers keep the hairline grid closed at both breakpoints. */
+function fillerCount(columns: number) {
+  return (columns - (PRODUCTS.length % columns)) % columns;
+}
+
 /**
- * Hairline grid of catalogued items; each card opens the item's detail page.
+ * A horizontal row of equal square tiles; each tile opens the item's
+ * detail page.
  */
 export function ProductsSection() {
   const count = String(PRODUCTS.length).padStart(2, "0");
-  const needsFiller = PRODUCTS.length % 2 === 1;
+  const fillersMobile = fillerCount(2);
+  const fillersDesktop = fillerCount(4);
 
   return (
     <motion.section
@@ -23,41 +30,55 @@ export function ProductsSection() {
         <span className="tabular-nums">{count} items</span>
       </div>
 
-      <div className="grid grid-cols-1 gap-px border border-white/10 bg-white/10 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-px border border-white/10 bg-white/10 sm:grid-cols-4">
         {PRODUCTS.map((product, index) => (
           <Link
             key={product.id}
             to={`/products/${product.id}`}
-            className="group flex flex-col gap-5 bg-[#0a0a0a] p-5 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-6"
+            className="group flex aspect-square flex-col bg-[#0a0a0a] p-4 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-5"
           >
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-neutral-500">
+            <div className="flex items-center justify-between gap-2 text-[9px] uppercase tracking-[0.3em] text-neutral-500 sm:text-[10px]">
               <span className="tabular-nums">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span>{product.category}</span>
+              <span className="truncate">{product.category}</span>
             </div>
 
-            <div>
-              <h3 className="text-sm tracking-wide text-neutral-100 transition-colors group-hover:text-white">
+            <div className="mt-auto min-w-0">
+              <h3 className="text-[13px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white">
                 {product.name}
               </h3>
-              <p className="mt-2 text-[11px] leading-relaxed tracking-[0.06em] text-neutral-500">
-                {product.summary}
+              <p className="mt-1.5 text-[10px] tracking-[0.12em] text-neutral-500">
+                {product.sku}
               </p>
             </div>
 
-            <div className="mt-auto flex items-end justify-between">
-              <span className="text-xs tabular-nums text-neutral-300">
+            <div className="mt-4 flex items-end justify-between gap-2 border-t border-white/10 pt-3">
+              <span className="min-w-0 truncate text-[11px] tabular-nums text-neutral-300">
                 {product.price}
               </span>
-              <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 transition-colors group-hover:text-neutral-200">
+              <span className="shrink-0 text-[9px] uppercase tracking-[0.25em] text-neutral-500 transition-colors group-hover:text-neutral-200">
                 open →
               </span>
             </div>
           </Link>
         ))}
-        {needsFiller && (
-          <div className="hidden bg-[#0a0a0a] sm:block" aria-hidden="true" />
+        {Array.from({ length: fillersMobile }, (_, i) => (
+          <div
+            key={`filler-m-${i}`}
+            className="aspect-square bg-[#0a0a0a]"
+            aria-hidden="true"
+          />
+        ))}
+        {Array.from(
+          { length: Math.max(0, fillersDesktop - fillersMobile) },
+          (_, i) => (
+            <div
+              key={`filler-d-${i}`}
+              className="hidden aspect-square bg-[#0a0a0a] sm:block"
+              aria-hidden="true"
+            />
+          ),
         )}
       </div>
     </motion.section>

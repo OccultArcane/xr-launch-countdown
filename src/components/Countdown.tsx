@@ -7,11 +7,16 @@ const DROP_HOUR = 0;
 
 const pad = (n: number) => String(Math.max(0, n)).padStart(2, "0");
 
-/** Timestamp of the next drop: DROP_WEEKDAY at DROP_HOUR, local time. */
+/**
+ * Timestamp of the next upcoming drop: DROP_WEEKDAY at DROP_HOUR, local
+ * time. Always strictly in the future, so the timer rolls straight over to
+ * the next Friday the moment a drop opens.
+ */
 function nextDrop(now: number): number {
   const date = new Date(now);
   date.setHours(DROP_HOUR, 0, 0, 0);
   date.setDate(date.getDate() + ((DROP_WEEKDAY - date.getDay() + 7) % 7));
+  if (date.getTime() <= now) date.setDate(date.getDate() + 7);
   return date.getTime();
 }
 
@@ -34,7 +39,7 @@ export function Countdown() {
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  const dropDay = remaining <= 0;
+  const dropDay = new Date(now).getDay() === DROP_WEEKDAY;
 
   const dropDate = new Date(target);
   const dateLabel = `${dropDate.getFullYear()}-${pad(dropDate.getMonth() + 1)}-${pad(dropDate.getDate())} · ${pad(dropDate.getHours())}:${pad(dropDate.getMinutes())}`;

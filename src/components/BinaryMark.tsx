@@ -10,6 +10,8 @@ type Cell = {
   speed: number;
   flipAt: number;
   drift: number;
+  redAt: number;
+  redDur: number;
 };
 
 type Mask = {
@@ -118,21 +120,24 @@ export function BinaryMark({ text = "xr", imageSrc }: BinaryMarkProps) {
       if (!octx) return null;
 
       const scale = Math.min(
-        (width * 0.7) / img.naturalWidth,
-        (height * 0.78) / img.naturalHeight,
+        (width * 0.72) / img.naturalWidth,
+        (height * 0.88) / img.naturalHeight,
       );
       const dw = img.naturalWidth * scale;
       const dh = img.naturalHeight * scale;
       octx.drawImage(img, (width - dw) / 2, (height - dh) / 2, dw, dh);
 
       const data = octx.getImageData(0, 0, width, height).data;
-      let transparent = false;
-      for (let i = 3; i < data.length; i += 128) {
-        if (data[i] < 250) {
-          transparent = true;
-          break;
-        }
+      // Images with real transparency are masked by alpha alone; fully
+      // opaque images are masked by whatever stands out from the
+      // corner colour (e.g. a white glyph on a solid tile).
+      let opaque = 0;
+      let sampled = 0;
+      for (let i = 3; i < data.length; i += 16) {
+        sampled += 1;
+        if (data[i] >= 128) opaque += 1;
       }
+      const transparent = sampled === 0 || opaque / sampled < 0.95;
       return { data, transparent, bg: [data[0], data[1], data[2]] };
     };
 
@@ -167,7 +172,7 @@ export function BinaryMark({ text = "xr", imageSrc }: BinaryMarkProps) {
             Math.abs(mask!.data[i + 1] - mask!.bg[1]),
             Math.abs(mask!.data[i + 2] - mask!.bg[2]),
           ) / 255;
-        return Math.min(1, d * 1.5);
+        return Math.min(1, d * 1.5) * a;
       };
 
       cell = width < 560 ? 8 : width < 900 ? 10 : 11;
@@ -203,6 +208,8 @@ export function BinaryMark({ text = "xr", imageSrc }: BinaryMarkProps) {
             speed: 0.35 + Math.random() * 1.1,
             flipAt: reduceMotion ? 0 : now + 500 + Math.random() * 4000,
             drift: anchored ? 0 : 3 + Math.random() * 9,
+            redAt: reduceMotion ? 0 : now + Math.random() * 25000,
+            redDur: 400 + Math.random() * 500,
           });
         }
       }
@@ -242,8 +249,22 @@ export function BinaryMark({ text = "xr", imageSrc }: BinaryMarkProps) {
           alpha *= 0.72 + 0.28 * Math.sin(t * 1.7 + c.phase * 3);
         }
 
+        // Every so often a single digit flashes red, then fades back.
+        let red = false;
+        if (c.redAt !== 0) {
+          if (nowMs >= c.redAt + c.redDur) {
+            c.redAt = nowMs + 15000 + Math.random() * 35000;
+          } else {
+            red = nowMs >= c.redAt;
+          }
+        }
+
         if (alpha < 0.015) continue;
-        ctx.fillStyle = styleFor(alpha);
+        if (red) {
+          ctx.fillStyle = `rgba(248,72,72,${Math.min(1, alpha * 1.3).toFixed(3)})`;
+        } else {
+          ctx.fillStyle = styleFor(alpha);
+        }
         ctx.fillText(c.ch, x, y);
       }
     };

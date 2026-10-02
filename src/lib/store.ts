@@ -15,11 +15,11 @@ export const SITE = {
   /** What the binary mark spells. */
   maskText: "xr",
   /**
-   * Optional logo mask. Drop a transparent PNG into /public (e.g.
-   * "mask-logo.png") and set it to "/mask-logo.png" — it replaces the
-   * text mark. Leave "" to keep the text.
+   * Logo used as the mask for the binary mark. Drop your own image into
+   * /public (transparent PNG or a shape on a solid tile) and point this
+   * at it — leave "" to fall back to maskText.
    */
-  maskImage: "",
+  maskImage: "/logo.svg",
   /** Your IMVU store URL — used as the fallback link on a product page. */
   storeUrl: "https://www.imvu.com/store/",
 };

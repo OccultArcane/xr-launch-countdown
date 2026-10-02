@@ -30,10 +30,10 @@ export function FaviconLink({
       rel="noopener noreferrer"
       title={name}
       aria-label={name}
-      className="group flex h-5 w-5 items-center justify-center opacity-80 outline-none transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:ring-white/50"
+      className="group flex h-8 w-8 items-center justify-center rounded-[6px] bg-white opacity-90 shadow-[0_1px_3px_rgba(0,0,0,0.45)] outline-none transition hover:opacity-100 focus-visible:ring-1 focus-visible:ring-white/50"
     >
       {failed ? (
-        <span className="flex h-5 w-5 items-center justify-center rounded-[3px] border border-white/20 text-[6px] tracking-tight text-neutral-400 transition-colors group-hover:border-white/50 group-hover:text-neutral-100">
+        <span className="text-[9px] tracking-tight text-neutral-700">
           {abbr}
         </span>
       ) : (
@@ -44,7 +44,7 @@ export function FaviconLink({
           height={20}
           loading="lazy"
           onError={() => setFailed(true)}
-          className="h-5 w-5 rounded-[3px] bg-white p-[3px] object-contain grayscale transition group-hover:grayscale-0"
+          className="h-5 w-5 object-contain grayscale transition group-hover:grayscale-0"
         />
       )}
     </a>
