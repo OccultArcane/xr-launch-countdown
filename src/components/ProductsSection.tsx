@@ -3,17 +3,21 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { PRODUCTS, type Product } from "@/lib/store";
 
-function Tile({ product, index }: { product: Product; index: number }) {
+function Tile({ product }: { product: Product }) {
   return (
     <Link
       to={`/products/${product.id}`}
-      className="glitch-hover group flex aspect-square w-[144px] flex-col bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]"
+      className="glitch-hover group flex aspect-square w-[144px] flex-col border border-white/10 bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]"
     >
-      <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] text-neutral-500 sm:text-[9px]">
-        <span className="tabular-nums">
-          {String(index + 1).padStart(2, "0")}
+      <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] sm:text-[9px]">
+        <span className="flex items-center gap-1.5 text-neutral-300">
+          <span
+            className="h-1.5 w-1.5 rounded-full bg-[#f84848]"
+            aria-hidden="true"
+          />
+          new
         </span>
-        <span className="truncate">{product.category}</span>
+        <span className="truncate text-neutral-500">{product.category}</span>
       </div>
 
       <div className="mt-auto min-w-0">
@@ -37,24 +41,11 @@ function Tile({ product, index }: { product: Product; index: number }) {
   );
 }
 
-function Stack({
-  items,
-  startIndex,
-  className,
-}: {
-  items: Product[];
-  startIndex: number;
-  className: string;
-}) {
+function Stack({ items, className }: { items: Product[]; className: string }) {
   return (
-    <div
-      className={
-        "grid shrink-0 grid-cols-1 gap-px border border-white/10 bg-white/10 " +
-        className
-      }
-    >
-      {items.map((product, i) => (
-        <Tile key={product.id} product={product} index={startIndex + i} />
+    <div className={"grid shrink-0 grid-cols-1 gap-2.5 " + className}>
+      {items.map((product) => (
+        <Tile key={product.id} product={product} />
       ))}
     </div>
   );
@@ -88,11 +79,7 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
 
       <div className="flex w-full flex-col items-center gap-8 lg:flex-row lg:items-center lg:gap-6">
         {hasProducts && (
-          <Stack
-            items={left}
-            startIndex={0}
-            className="order-1 hidden lg:grid"
-          />
+          <Stack items={left} className="order-1 hidden lg:grid" />
         )}
 
         {/* The mark: 0s and 1s assembling your logo silhouette */}
@@ -101,19 +88,15 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
         </div>
 
         {hasProducts && (
-          <div className="order-2 grid w-fit grid-cols-1 gap-px border border-white/10 bg-white/10 lg:hidden">
-            {PRODUCTS.map((product, i) => (
-              <Tile key={product.id} product={product} index={i} />
+          <div className="order-2 grid w-fit grid-cols-1 gap-2.5 lg:hidden">
+            {PRODUCTS.map((product) => (
+              <Tile key={product.id} product={product} />
             ))}
           </div>
         )}
 
         {hasProducts && (
-          <Stack
-            items={right}
-            startIndex={left.length}
-            className="order-3 hidden lg:grid"
-          />
+          <Stack items={right} className="order-3 hidden lg:grid" />
         )}
       </div>
     </motion.section>
