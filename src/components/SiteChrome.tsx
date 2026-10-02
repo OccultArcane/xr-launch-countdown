@@ -10,6 +10,43 @@ const SOCIALS = [
   { name: "GitHub", abbr: "GH", domain: "github.com" },
 ];
 
+/**
+ * Edge-detection filter: renders any favicon as a thin outline instead of a
+ * solid image. Defined once in the header; referenced by every icon.
+ */
+function IconOutlineDefs() {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      className="pointer-events-none absolute h-0 w-0 overflow-hidden"
+    >
+      <defs>
+        <filter id="xr-icon-outline" colorInterpolationFilters="sRGB">
+          <feColorMatrix
+            type="matrix"
+            result="gray"
+            values="0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 1 0"
+          />
+          <feConvolveMatrix
+            in="gray"
+            order="3"
+            divisor="1"
+            preserveAlpha="true"
+            kernelMatrix="0 -1 0 -1 4 -1 0 -1 0"
+            result="edges"
+          />
+          <feColorMatrix
+            in="edges"
+            type="matrix"
+            values="0 0 0 0 0.88 0 0 0 0 0.88 0 0 0 0 0.88 1 0 0 0 -0.12"
+          />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
 export function FaviconLink({
   name,
   abbr,
@@ -30,10 +67,10 @@ export function FaviconLink({
       rel="noopener noreferrer"
       title={name}
       aria-label={name}
-      className="group flex h-8 w-8 items-center justify-center rounded-[6px] bg-white opacity-90 shadow-[0_1px_3px_rgba(0,0,0,0.45)] outline-none transition hover:opacity-100 focus-visible:ring-1 focus-visible:ring-white/50"
+      className="group flex h-8 w-8 items-center justify-center rounded-[6px] border border-white/15 bg-white/[0.04] opacity-90 outline-none transition hover:border-white/40 hover:opacity-100 focus-visible:ring-1 focus-visible:ring-white/50"
     >
       {failed ? (
-        <span className="text-[9px] tracking-tight text-neutral-700">
+        <span className="text-[9px] tracking-tight text-neutral-400">
           {abbr}
         </span>
       ) : (
@@ -44,7 +81,8 @@ export function FaviconLink({
           height={20}
           loading="lazy"
           onError={() => setFailed(true)}
-          className="h-5 w-5 object-contain grayscale transition group-hover:grayscale-0"
+          style={{ filter: "url(#xr-icon-outline)" }}
+          className="h-5 w-5 object-contain opacity-80 transition-opacity group-hover:opacity-100"
         />
       )}
     </a>
@@ -54,7 +92,8 @@ export function FaviconLink({
 export function SiteHeader() {
   return (
     <header className="border-b border-white/10">
-      <div className="mx-auto flex min-h-14 w-full max-w-5xl items-center justify-between gap-4 px-6">
+      <div className="relative mx-auto flex min-h-14 w-full max-w-5xl items-center justify-between gap-4 px-6">
+        <IconOutlineDefs />
         <Link
           to="/"
           className="whitespace-nowrap text-[10px] lowercase tracking-[0.06em] text-neutral-200 outline-none transition-colors hover:text-white focus-visible:ring-1 focus-visible:ring-white/50 sm:text-sm sm:tracking-[0.35em]"
