@@ -54,14 +54,17 @@ export function FaviconLink({
 export function SiteHeader() {
   return (
     <header className="border-b border-white/10">
-      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-6">
+      <div className="mx-auto flex min-h-14 w-full max-w-5xl items-center justify-between gap-4 px-6">
         <Link
           to="/"
-          className="text-sm lowercase tracking-[0.4em] text-neutral-200 outline-none transition-colors hover:text-white focus-visible:ring-1 focus-visible:ring-white/50"
+          className="whitespace-nowrap text-[10px] lowercase tracking-[0.06em] text-neutral-200 outline-none transition-colors hover:text-white focus-visible:ring-1 focus-visible:ring-white/50 sm:text-sm sm:tracking-[0.35em]"
         >
-          support
+          supported creators
         </Link>
-        <nav aria-label="social links" className="flex items-center gap-2.5">
+        <nav
+          aria-label="social links"
+          className="flex items-center gap-2 sm:gap-2.5"
+        >
           {SOCIALS.map((social) => (
             <FaviconLink key={social.domain} {...social} />
           ))}

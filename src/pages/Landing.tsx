@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { BinaryMark } from "@/components/BinaryMark";
 import { Countdown } from "@/components/Countdown";
-import { ProductsSection } from "@/components/ProductsSection";
+import { MarkWithProducts } from "@/components/ProductsSection";
 import { SiteFooter, SiteHeader, FaviconLink } from "@/components/SiteChrome";
 import { SITE } from "@/lib/store";
 
@@ -21,25 +21,19 @@ export default function Landing() {
       <SiteHeader />
 
       <main className="flex flex-1 items-center justify-center px-6 py-14">
-        {" "}
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-14 sm:gap-16">
           <h1 className="sr-only">xr — IMVU storefront</h1>
 
-          {/* The mark: 0s and 1s assembling your logo or wordmark */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="h-[clamp(240px,42vh,440px)] w-full"
-          >
+          {/* The mark flanked by the catalog, two tiles a side */}
+          <MarkWithProducts>
             <BinaryMark
               text={SITE.maskText}
               imageSrc={SITE.maskImage || undefined}
               fallbackImageSrc={SITE.maskImageFallback || undefined}
             />
-          </motion.div>
+          </MarkWithProducts>
 
-          {/* Countdown to launch, with an editable target date */}
+          {/* Countdown to the weekly Friday drop */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -61,9 +55,6 @@ export default function Landing() {
               <FaviconLink key={social.domain} {...social} />
             ))}
           </motion.nav>
-
-          {/* Catalog */}
-          <ProductsSection />
         </div>
       </main>
 

@@ -1,84 +1,147 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import { PRODUCTS } from "@/lib/store";
+import { PRODUCTS, type Product } from "@/lib/store";
 
-/** Fillers keep the hairline grid closed at both breakpoints. */
-function fillerCount(columns: number) {
-  return (columns - (PRODUCTS.length % columns)) % columns;
+/** Fillers keep each hairline pair closed at two columns. */
+const pairFillers = (count: number) => (2 - (count % 2)) % 2;
+
+function Tile({
+  product,
+  index,
+  fixed,
+}: {
+  product: Product;
+  index: number;
+  fixed?: boolean;
+}) {
+  return (
+    <Link
+      to={`/products/${product.id}`}
+      className={
+        "group flex aspect-square flex-col bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 " +
+        (fixed ? "w-[136px] xl:w-[148px]" : "")
+      }
+    >
+      <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] text-neutral-500 sm:text-[9px]">
+        <span className="tabular-nums">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="truncate">{product.category}</span>
+      </div>
+
+      <div className="mt-auto min-w-0">
+        <h3 className="text-[11px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white sm:text-[12px]">
+          {product.name}
+        </h3>
+        <p className="mt-1 text-[9px] tracking-[0.1em] text-neutral-500">
+          {product.sku}
+        </p>
+      </div>
+
+      <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-white/10 pt-2">
+        <span className="min-w-0 truncate text-[10px] tabular-nums text-neutral-300">
+          {product.price}
+        </span>
+        <span className="shrink-0 text-[11px] text-neutral-500 transition-colors group-hover:text-neutral-200">
+          →
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+function Pair({
+  items,
+  startIndex,
+  className,
+}: {
+  items: Product[];
+  startIndex: number;
+  className: string;
+}) {
+  return (
+    <div
+      className={
+        "grid shrink-0 grid-cols-2 gap-px border border-white/10 bg-white/10 " +
+        className
+      }
+    >
+      {items.map((product, i) => (
+        <Tile key={product.id} product={product} index={startIndex + i} fixed />
+      ))}
+      {Array.from({ length: pairFillers(items.length) }, (_, i) => (
+        <div
+          key={`filler-${i}`}
+          className="aspect-square bg-[#0a0a0a]"
+          aria-hidden="true"
+        />
+      ))}
+    </div>
+  );
 }
 
 /**
- * A horizontal row of equal square tiles; each tile opens the item's
- * detail page.
+ * The catalog beside the mark: two square tiles flanking it on each side on
+ * desktop, and a 2×2 block under it on smaller screens.
  */
-export function ProductsSection() {
-  const count = String(PRODUCTS.length).padStart(2, "0");
-  const fillersMobile = fillerCount(2);
-  const fillersDesktop = fillerCount(4);
+export function MarkWithProducts({ children }: { children: ReactNode }) {
+  const mid = Math.ceil(PRODUCTS.length / 2);
+  const left = PRODUCTS.slice(0, mid);
+  const right = PRODUCTS.slice(mid);
+  const hasProducts = PRODUCTS.length > 0;
 
   return (
     <motion.section
       id="products"
-      aria-label="products"
+      aria-label="new products"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-      className="w-full max-w-5xl scroll-m-24 border-t border-white/10 pt-10 sm:pt-12"
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      className="w-full scroll-m-24"
     >
       <div className="mb-6 flex items-baseline justify-between text-[10px] uppercase tracking-[0.35em] text-neutral-500">
         <span>new products</span>
-        <span className="tabular-nums">{count} items</span>
+        <span className="tabular-nums">
+          {String(PRODUCTS.length).padStart(2, "0")} items
+        </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-px border border-white/10 bg-white/10 sm:grid-cols-4">
-        {PRODUCTS.map((product, index) => (
-          <Link
-            key={product.id}
-            to={`/products/${product.id}`}
-            className="group flex aspect-square flex-col bg-[#0a0a0a] p-4 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-5"
-          >
-            <div className="flex items-center justify-between gap-2 text-[9px] uppercase tracking-[0.3em] text-neutral-500 sm:text-[10px]">
-              <span className="tabular-nums">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span className="truncate">{product.category}</span>
-            </div>
-
-            <div className="mt-auto min-w-0">
-              <h3 className="text-[13px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white">
-                {product.name}
-              </h3>
-              <p className="mt-1.5 text-[10px] tracking-[0.12em] text-neutral-500">
-                {product.sku}
-              </p>
-            </div>
-
-            <div className="mt-4 flex items-end justify-between gap-2 border-t border-white/10 pt-3">
-              <span className="min-w-0 truncate text-[11px] tabular-nums text-neutral-300">
-                {product.price}
-              </span>
-              <span className="shrink-0 text-[9px] uppercase tracking-[0.25em] text-neutral-500 transition-colors group-hover:text-neutral-200">
-                open →
-              </span>
-            </div>
-          </Link>
-        ))}
-        {Array.from({ length: fillersMobile }, (_, i) => (
-          <div
-            key={`filler-m-${i}`}
-            className="aspect-square bg-[#0a0a0a]"
-            aria-hidden="true"
+      <div className="flex w-full flex-col items-center gap-8 lg:flex-row lg:items-center lg:gap-6">
+        {hasProducts && (
+          <Pair
+            items={left}
+            startIndex={0}
+            className="order-1 hidden lg:grid"
           />
-        ))}
-        {Array.from(
-          { length: Math.max(0, fillersDesktop - fillersMobile) },
-          (_, i) => (
-            <div
-              key={`filler-d-${i}`}
-              className="hidden aspect-square bg-[#0a0a0a] sm:block"
-              aria-hidden="true"
-            />
-          ),
+        )}
+
+        {/* The mark: 0s and 1s assembling your logo silhouette */}
+        <div className="order-1 h-[clamp(240px,42vh,440px)] w-full lg:order-2 lg:w-auto lg:flex-1">
+          {children}
+        </div>
+
+        {hasProducts && (
+          <div className="order-2 grid w-full max-w-sm grid-cols-2 gap-px border border-white/10 bg-white/10 lg:hidden">
+            {PRODUCTS.map((product, i) => (
+              <Tile key={product.id} product={product} index={i} />
+            ))}
+            {Array.from({ length: pairFillers(PRODUCTS.length) }, (_, i) => (
+              <div
+                key={`filler-${i}`}
+                className="aspect-square bg-[#0a0a0a]"
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+        )}
+
+        {hasProducts && (
+          <Pair
+            items={right}
+            startIndex={left.length}
+            className="order-3 hidden lg:grid"
+          />
         )}
       </div>
     </motion.section>
