@@ -7,8 +7,8 @@ const DOC_URL = "/notification.txt";
 const FALLBACK_TEXT = "Discord server is in devolpment";
 /** Milliseconds per tick of the typewriter — one character typed per tick. */
 const TYPE_MS = 55;
-/** Pause (~2s) on the finished line before it starts deleting. */
-const HOLD_TICKS = 36;
+/** Pause on the finished line before it starts deleting — 30 seconds. */
+const HOLD_TICKS = Math.round(30_000 / TYPE_MS);
 /** Characters erased per tick — deleting runs about twice as fast. */
 const ERASE_STEP = 2;
 /** Pause (~0.4s) on the empty line before retyping. */
