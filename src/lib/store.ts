@@ -28,13 +28,14 @@ export const SITE = {
    */
   maskImageFallback: "/xr-mask-fallback.svg",
   /**
-   * Display font the binary mask is drawn in — Deutsch Gothic by James
-   * Fordyce (100% free; licence text ships as /public/DEUTSCH.TXT). The
-   * mask is the wordmark "xr" set in this face; tried first, falling
-   * through to maskImage, then maskImageFallback if the file is missing
-   * or unreadable. Leave "" for no font mask.
+   * Display font the binary mask is drawn in — UnifrakturCook, a bold
+   * blackletter free under the SIL OFL (licence text ships as
+   * /public/UNIFRAKTURCOOK-OFL.txt). The mask is the letterforms "xr"
+   * set in this face; tried first, falling through to maskImage, then
+   * maskImageFallback if the file is missing or unreadable. Leave "" for
+   * no font mask.
    */
-  maskFontFile: "/deutsch-gothic.ttf",
+  maskFontFile: "/unifrakturcook-bold.ttf",
   /**
    * Live feed for the "new products" section: the 4 most recently created
    * items fill the tiles automatically (expects an array of { name, price,

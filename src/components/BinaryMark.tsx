@@ -134,8 +134,8 @@ type BinaryMarkProps = {
   /** Text the mark spells. Used when nothing above masks it. */
   text?: string;
   /**
-   * Display font file the mask is drawn in, e.g. "/deutsch-gothic.ttf" —
-   * tried first, so the wordmark in that typeface is the mask whenever
+   * Display font file the mask is drawn in, e.g. "/unifrakturcook-bold.ttf"
+   * — tried first, so the wordmark in that typeface is the mask whenever
    * the file loads.
    */
   fontSrc?: string;
@@ -145,17 +145,28 @@ type BinaryMarkProps = {
   fallbackImageSrc?: string;
 };
 
+let maskFontFace: FontFace | null = null;
+let maskFontUrl: string | null = null;
 let maskFontName: string | null = null;
 
-/** Loads a custom display font once so the text mask can be drawn in it. */
+/**
+ * Loads the display font for the mask. The loaded face is tracked per URL
+ * so switching fonts (e.g. a config edit under HMR) swaps the face instead
+ * of silently reusing the previous one.
+ */
 const loadMaskFont = async (url: string): Promise<string | null> => {
-  if (maskFontName) return maskFontName;
+  if (maskFontName && maskFontUrl === url) return maskFontName;
   try {
+    if (maskFontFace) document.fonts.delete(maskFontFace);
     const face = new FontFace("XrMaskFont", `url("${url}")`);
     await face.load();
     document.fonts.add(face);
+    maskFontFace = face;
+    maskFontUrl = url;
     maskFontName = "XrMaskFont";
   } catch {
+    maskFontFace = null;
+    maskFontUrl = null;
     maskFontName = null; // retry on the next rebuild in case it appears later
   }
   return maskFontName;
@@ -405,7 +416,7 @@ export function BinaryMark({
       sprites.clear();
 
       // Font mask wins: the wordmark set in the configured display font
-      // (Deutsch Gothic) is the silhouette whenever its file is present.
+      // (UnifrakturCook) is the silhouette whenever its file is present.
       let mask: Mask | null = null;
       if (fontSrc) {
         const family = await loadMaskFont(fontSrc);
