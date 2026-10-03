@@ -12,8 +12,13 @@
 export const SITE = {
   /** Brand shown in the header and footer. */
   name: "xr",
-  /** What the binary mark spells — the centred blackletter "xr" pair. */
-  maskText: "xr",
+  /**
+   * What the binary mark spells — the centred blackletter pair. Set in
+   * capitals: UnifrakturCook's ornate X and R fill the stage far more
+   * than the lowercase pair, so the wordmark reads more clearly at a
+   * glance. (The x/r glyph streams inside the mask stay lowercase.)
+   */
+  maskText: "XR",
   /**
    * Logo used as the mask for the binary mark when no font mask loads.
    * Save your artwork into /public (e.g. "xr-mask.png" — transparent PNG
