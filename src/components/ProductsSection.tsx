@@ -20,13 +20,22 @@ function Tile({ product }: { product: Product }) {
         <span className="truncate text-neutral-500">{product.category}</span>
       </div>
 
+      {/* Image slot — set product.image in src/lib/store.ts to fill it */}
+      <div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
+        {product.image && (
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            className="max-h-full max-w-full object-contain"
+          />
+        )}
+      </div>
+
       <div className="mt-auto min-w-0">
         <h3 className="text-[11px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white sm:text-[12px]">
           {product.name}
         </h3>
-        <p className="mt-1 text-[9px] tracking-[0.1em] text-neutral-500">
-          {product.sku}
-        </p>
       </div>
 
       <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-white/10 pt-2">
