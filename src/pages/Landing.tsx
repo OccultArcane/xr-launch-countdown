@@ -39,12 +39,12 @@ export default function Landing() {
                 imageSrc={SITE.maskImage || undefined}
                 fallbackImageSrc={SITE.maskImageFallback || undefined}
                 caption={
-                  // Quoted, italic slogan in Discord's inactive grey —
-                  // anchored under the wordmark and tilting with the mark.
-                  // The brand X and R pick up the accent red.
+                  // Italic slogan in Discord's inactive grey — anchored
+                  // under the wordmark and tilting with the mark. The
+                  // brand X and R pick up the accent red.
                   <p className="text-center text-[10px] italic tracking-[0.16em] text-neutral-600 sm:text-[12px] sm:tracking-[0.2em]">
-                    &ldquo;<span className="text-xr-red">X</span>tend Your{" "}
-                    <span className="text-xr-red">R</span>eality.&rdquo;
+                    <span className="text-xr-red">X</span>tend Your{" "}
+                    <span className="text-xr-red">R</span>eality
                   </p>
                 }
               />
