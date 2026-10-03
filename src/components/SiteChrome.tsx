@@ -44,7 +44,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-white/10">
       <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-2.5 px-6 py-7 text-center">
-        <p className="text-[9px] tracking-[0.18em] text-[#f84848] sm:text-[11px] sm:tracking-[0.28em]">
+        <p className="text-[9px] tracking-[0.18em] text-xr-red sm:text-[11px] sm:tracking-[0.28em]">
           ALL THEFT WILL RESULT IN DMCA CONSEQUENCES
         </p>
         <p className="text-[9px] tracking-[0.24em] text-neutral-500 sm:text-[10px] sm:tracking-[0.3em]">

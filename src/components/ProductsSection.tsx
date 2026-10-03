@@ -13,7 +13,7 @@ function Tile({ product }: { product: Product }) {
       <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] sm:text-[9px]">
         <span className="flex items-center gap-1.5 text-neutral-300">
           <span
-            className="blink-dot h-1.5 w-1.5 rounded-full bg-[#f84848]"
+            className="blink-dot h-1.5 w-1.5 rounded-full bg-xr-red"
             aria-hidden="true"
           />
           new

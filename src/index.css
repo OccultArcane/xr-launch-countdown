@@ -42,6 +42,12 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* xr accent — one red for the countdown label/date, the flashing NEW dots
+   and the DMCA line, so they can never drift apart. */
+@theme {
+  --color-xr-red: #f84848;
+}
+
 /* CHANGE VALUES FOR THEME */
 :root {
   --radius: 0.625rem;
