@@ -4,35 +4,41 @@
   height="768"
   viewBox="0 0 1024 768"
   role="img"
-  aria-label="xr spiky black-metal monogram"
+  aria-label="xr blackletter monogram"
 >
-  <!-- Interim stand-in silhouette for the binary mark mask, drawn in the
-       spiky gore/blackmetal style. For the exact letterforms, drop the real
-       font file into /public and set SITE.maskFontFile. -->
+  <!-- Interim stand-in silhouette for the binary mark mask, drawn as
+       fraktur/blackletter X and R: heavy angular stems, wedge serifs,
+       broken diagonal cuts and a lozenge at the crossing.
+       For the exact letterforms, drop the real font file into /public
+       and set SITE.maskFontFile. -->
   <g fill="#ffffff">
-    <!-- X: blade stroke, top-left down to bottom-right -->
+    <!-- X: heavy stroke, top-left down to bottom-right -->
     <path
-      d="M168 52 L150 150 L206 210 L176 300 L240 360 L216 440 L286 500 L268 580 L340 650 L430 712 L452 660 L396 600 L420 522 L356 470 L376 388 L316 330 L330 252 L272 196 L286 110 L224 74 Z"
+      d="M126 96 L138 180 L176 252 L224 292 L232 360 L282 458 L334 556 L388 650 L420 712 L474 704 L438 628 L392 540 L346 452 L300 364 L268 300 L252 276 L210 190 L196 110 Z"
     />
-    <!-- X: blade stroke, top-right down to bottom-left -->
+    <!-- X: crossing stroke, top-right down to bottom-left -->
     <path
-      d="M438 58 L470 140 L420 205 L452 290 L396 350 L410 430 L350 500 L360 580 L296 646 L152 714 L188 650 L246 596 L240 506 L296 452 L286 376 L344 318 L330 240 L386 182 L372 104 Z"
+      d="M352 96 L336 180 L296 268 L256 360 L212 458 L166 556 L118 652 L96 712 L156 708 L196 630 L244 542 L288 454 L334 364 L376 276 L416 192 L438 112 Z"
     />
-    <!-- X: loose thorn barbs -->
-    <path d="M200 310 L128 344 L206 372 Z" />
-    <path d="M430 296 L500 330 L434 360 Z" />
+    <!-- X: lozenge at the crossing -->
+    <path d="M300 372 L346 416 L300 462 L254 416 Z" />
+    <!-- X: wedge serifs -->
+    <path d="M126 96 L86 156 L152 140 Z" />
+    <path d="M416 112 L468 78 L452 148 Z" />
+    <path d="M96 712 L58 700 L104 656 Z" />
+    <path d="M420 712 L472 744 L466 686 Z" />
 
-    <!-- R: jagged stem -->
+    <!-- R: heavy stem with wedge foot -->
     <path
-      d="M566 56 L544 150 L592 230 L552 320 L600 410 L566 500 L616 590 L604 706 L648 660 L630 560 L664 470 L636 380 L664 290 L634 200 L646 110 L616 52 Z"
+      d="M556 60 L636 86 L648 190 L656 306 L664 424 L672 544 L682 644 L724 706 L646 724 L624 646 L610 534 L600 414 L592 296 L582 184 L540 116 Z"
     />
-    <!-- R: bowl ring (outer contour + counter, wound for a clean hole) -->
+    <!-- R: angular bowl ring (outer contour + counter, opposite winding) -->
     <path
-      d="M608 96 L716 66 L830 62 L884 138 L864 236 L890 318 L848 424 L752 474 L668 456 L636 420 Z M690 396 L744 420 L800 396 L822 318 L806 236 L824 158 L760 132 L696 138 Z"
+      d="M620 92 L716 70 L838 78 L912 138 L894 244 L920 320 L872 396 L790 448 L694 462 L640 438 Z M696 404 L760 420 L822 384 L846 306 L822 232 L834 164 L762 136 L696 142 Z"
     />
-    <!-- R: kicking leg -->
+    <!-- R: kicking leg with wedge terminal -->
     <path
-      d="M676 432 L764 464 L828 552 L908 664 L944 700 L876 634 L818 548 L748 496 L668 470 Z"
+      d="M666 440 L758 464 L846 552 L928 672 L968 720 L906 704 L836 612 L754 522 L660 476 Z"
     />
   </g>
 </svg>
