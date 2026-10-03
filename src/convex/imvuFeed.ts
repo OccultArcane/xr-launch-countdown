@@ -9,7 +9,7 @@ import type { Product } from "../lib/store";
  * (`/shop/product.php?products_id=…` → the "by …" creator link, which
  * carries `manufacturers_id=<id>`).
  */
-const MANUFACTURERS_ID = "";
+const MANUFACTURERS_ID = "106440837";
 
 export const latest = action({
   args: {},

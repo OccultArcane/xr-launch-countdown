@@ -27,7 +27,14 @@ const decodeEntities = (value: string) =>
     .replace(/&#0*39;|&apos;/g, "'")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
+    .replace(/&#(\d+);/g, (_, code) => {
+      const point = Number(code);
+      // Product names use high-plane glyphs (e.g. &#120169;) that
+      // fromCharCode would mangle — fromCodePoint handles them.
+      return Number.isInteger(point) && point <= 0x10ffff
+        ? String.fromCodePoint(point)
+        : "";
+    });
 
 /**
  * Extracts the product cards from a shop listing page. Rows come back in
