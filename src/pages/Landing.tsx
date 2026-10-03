@@ -29,6 +29,7 @@ export default function Landing() {
             <MarkWithProducts>
               <BinaryMark
                 text={SITE.maskText}
+                fontSrc={SITE.maskFontFile || undefined}
                 imageSrc={SITE.maskImage || undefined}
                 fallbackImageSrc={SITE.maskImageFallback || undefined}
               />

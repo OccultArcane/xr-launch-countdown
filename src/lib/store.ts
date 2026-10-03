@@ -22,9 +22,15 @@ export const SITE = {
   maskImage: "/xr-mask.png",
   /**
    * Stand-in silhouette used until maskImage exists, so the mark always
-   * masks to the gothic xr shape.
+   * masks to a styled xr shape (currently the spiky black-metal drawn set).
    */
   maskImageFallback: "/xr-mask-fallback.svg",
+  /**
+   * Optional display font file for the text mask — e.g. "/gorewild.ttf"
+   * after dropping the font into /public. Leave "" to use the fallback
+   * artwork above.
+   */
+  maskFontFile: "",
   /** Your IMVU store URL — used as the fallback link on a product page. */
   storeUrl: "https://www.imvu.com/store/",
 };

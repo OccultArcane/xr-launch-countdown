@@ -120,10 +120,28 @@ function dominantColor(
 type BinaryMarkProps = {
   /** Text the mark spells. Used when no image is supplied or it fails. */
   text?: string;
+  /** Font file the text mask is drawn in, e.g. "/gorewild.ttf". */
+  fontSrc?: string;
   /** Logo image used as the mask (transparent PNG or shape on flat bg). */
   imageSrc?: string;
   /** Tried when `imageSrc` is missing or fails to load. */
   fallbackImageSrc?: string;
+};
+
+let maskFontName: string | null = null;
+
+/** Loads a custom display font once so the text mask can be drawn in it. */
+const loadMaskFont = async (url: string): Promise<string | null> => {
+  if (maskFontName) return maskFontName;
+  try {
+    const face = new FontFace("XrMaskFont", `url("${url}")`);
+    await face.load();
+    document.fonts.add(face);
+    maskFontName = "XrMaskFont";
+  } catch {
+    maskFontName = null; // retry on the next rebuild in case it appears later
+  }
+  return maskFontName;
 };
 
 /**
@@ -133,6 +151,7 @@ type BinaryMarkProps = {
  */
 export function BinaryMark({
   text = "xr",
+  fontSrc,
   imageSrc,
   fallbackImageSrc,
 }: BinaryMarkProps) {
@@ -170,7 +189,7 @@ export function BinaryMark({
       return off;
     };
 
-    const rasterizeText = (): Mask => {
+    const rasterizeText = (family: string = FONT_FAMILY): Mask => {
       const off = newCanvas(width, height);
       const octx = off.getContext("2d", { willReadFrequently: true });
       if (!octx)
@@ -184,12 +203,12 @@ export function BinaryMark({
       octx.textAlign = "center";
       octx.textBaseline = "middle";
       let fontSize = Math.min(height * 1.1, width * 0.6);
-      octx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
+      octx.font = `700 ${fontSize}px ${family}`;
       const metrics = octx.measureText(text);
       const maxWidth = width * 0.85;
       if (metrics.width > maxWidth && metrics.width > 0) {
         fontSize *= maxWidth / metrics.width;
-        octx.font = `700 ${fontSize}px ${FONT_FAMILY}`;
+        octx.font = `700 ${fontSize}px ${family}`;
       }
       octx.fillText(text, width / 2, height / 2);
       return {
@@ -335,11 +354,19 @@ export function BinaryMark({
       cell = width < 560 ? 12 : width < 900 ? 14 : 15;
 
       let mask: Mask | null = null;
-      for (const candidate of [imageSrc, fallbackImageSrc]) {
-        if (!candidate) continue;
-        mask = await rasterizeImage(candidate);
+      if (imageSrc) {
+        mask = await rasterizeImage(imageSrc);
         if (id !== buildId) return; // a newer rebuild superseded this one
-        if (mask) break;
+      }
+      let family: string | null = null;
+      if (!mask && fontSrc) {
+        family = await loadMaskFont(fontSrc);
+        if (id !== buildId) return;
+        if (family) mask = rasterizeText(family);
+      }
+      if (!mask && fallbackImageSrc) {
+        mask = await rasterizeImage(fallbackImageSrc);
+        if (id !== buildId) return;
       }
       if (!mask) mask = rasterizeText();
 
@@ -516,7 +543,7 @@ export function BinaryMark({
       window.clearTimeout(resizeTimer);
       cancelAnimationFrame(raf);
     };
-  }, [text, imageSrc, fallbackImageSrc]);
+  }, [text, fontSrc, imageSrc, fallbackImageSrc]);
 
   // 3D parallax: the stage leans toward the pointer and settles on leave.
   const handleMove = (event: ReactPointerEvent<HTMLDivElement>) => {

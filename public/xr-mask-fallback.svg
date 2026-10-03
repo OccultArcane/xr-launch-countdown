@@ -1,39 +1,38 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="1024"
-  height="1024"
-  viewBox="0 0 1024 1024"
+  height="768"
+  viewBox="0 0 1024 768"
   role="img"
-  aria-label="xr gothic monogram"
+  aria-label="xr spiky black-metal monogram"
 >
-  <!-- Interim stand-in silhouette for the binary mark mask.
-       Replace with the real artwork saved as public/xr-mask.png. -->
-  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
-    <!-- x: upper-left through the crossing into the lower-right foot -->
-    <path d="M250 308 C304 372 344 434 376 500 C414 574 466 646 520 710" stroke-width="92" />
-    <!-- x: upper-right through the crossing into the lower-left -->
-    <path d="M487 300 C446 372 406 438 376 500 C346 564 302 626 260 676" stroke-width="88" />
-    <!-- x: whip tail curling off the lower-left -->
-    <path d="M268 660 C238 702 212 734 198 762" stroke-width="22" />
-    <!-- r: stem -->
-    <path d="M616 320 C602 450 606 590 634 706" stroke-width="96" />
-    <!-- r: shoulder reaching for the diamond -->
-    <path d="M640 340 C696 314 734 320 764 356" stroke-width="62" />
-    <!-- r: foot sweeping off the stem base -->
-    <path d="M640 690 C672 722 700 742 726 752" stroke-width="54" />
-  </g>
+  <!-- Interim stand-in silhouette for the binary mark mask, drawn in the
+       spiky gore/blackmetal style. For the exact letterforms, drop the real
+       font file into /public and set SITE.maskFontFile. -->
   <g fill="#ffffff">
-    <!-- x: upper-left flag -->
-    <polygon points="250,246 312,308 250,370 188,308" />
-    <!-- x: upper-right diamond -->
-    <polygon points="487,236 551,300 487,364 423,300" />
-    <!-- x: lower-right foot diamond -->
-    <polygon points="516,646 576,706 516,766 456,706" />
-    <!-- r: stem-top flag -->
-    <polygon points="592,268 636,312 592,356 548,312" />
-    <!-- r: terminal diamond -->
-    <polygon points="798,274 864,340 798,406 732,340" />
-    <!-- r: foot point -->
-    <polygon points="700,706 752,744 716,798 664,760" />
+    <!-- X: blade stroke, top-left down to bottom-right -->
+    <path
+      d="M168 52 L150 150 L206 210 L176 300 L240 360 L216 440 L286 500 L268 580 L340 650 L430 712 L452 660 L396 600 L420 522 L356 470 L376 388 L316 330 L330 252 L272 196 L286 110 L224 74 Z"
+    />
+    <!-- X: blade stroke, top-right down to bottom-left -->
+    <path
+      d="M438 58 L470 140 L420 205 L452 290 L396 350 L410 430 L350 500 L360 580 L296 646 L152 714 L188 650 L246 596 L240 506 L296 452 L286 376 L344 318 L330 240 L386 182 L372 104 Z"
+    />
+    <!-- X: loose thorn barbs -->
+    <path d="M200 310 L128 344 L206 372 Z" />
+    <path d="M430 296 L500 330 L434 360 Z" />
+
+    <!-- R: jagged stem -->
+    <path
+      d="M566 56 L544 150 L592 230 L552 320 L600 410 L566 500 L616 590 L604 706 L648 660 L630 560 L664 470 L636 380 L664 290 L634 200 L646 110 L616 52 Z"
+    />
+    <!-- R: bowl ring (outer contour + counter, wound for a clean hole) -->
+    <path
+      d="M608 96 L716 66 L830 62 L884 138 L864 236 L890 318 L848 424 L752 474 L668 456 L636 420 Z M690 396 L744 420 L800 396 L822 318 L806 236 L824 158 L760 132 L696 138 Z"
+    />
+    <!-- R: kicking leg -->
+    <path
+      d="M676 432 L764 464 L828 552 L908 664 L944 700 L876 634 L818 548 L748 496 L668 470 Z"
+    />
   </g>
 </svg>
