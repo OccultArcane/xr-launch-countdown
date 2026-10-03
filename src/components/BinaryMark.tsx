@@ -162,12 +162,12 @@ const loadMaskFont = async (url: string): Promise<string | null> => {
 };
 
 /**
- * The XR monogram built from tiny digits: Matrix-style streams fall
- * downward through the blackletter silhouette — dense inside, sparse
- * outside — punctuated by rare red sparks and glitch bursts.
+ * The blackletter "xr" mark built from tiny digits: Matrix-style streams
+ * fall downward through the silhouette — digits only, nothing outside the
+ * mask — punctuated by rare red sparks and glitch bursts.
  */
 export function BinaryMark({
-  text = "XR",
+  text = "xr",
   fontSrc,
   imageSrc,
   fallbackImageSrc,
@@ -491,11 +491,8 @@ export function BinaryMark({
           } else if (cov >= 0.28) {
             // Edge cells are kept so the digits hug the outline closely.
             alpha = 0.3 + Math.random() * 0.3;
-          } else if (Math.random() < 0.055) {
-            // Sparse field outside the letters — kept very dim so the
-            // monogram stays the clear, high-contrast subject.
-            alpha = 0.05 + Math.random() * 0.12;
           }
+          // Nothing outside the mask — only the logo shows 0s and 1s.
           if (alpha <= 0) continue;
 
           let col = columns.get(gx);
