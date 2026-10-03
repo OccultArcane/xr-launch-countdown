@@ -264,6 +264,12 @@ export function BinaryMark({
       return spr;
     };
 
+    /**
+     * Rasterizes the wordmark sized to fill the stage: real ink extents
+     * are measured and the font scaled so the letters span most of the
+     * box on both axes — slim margins on the top and sides, with the
+     * remaining slack pooled at the bottom where the slogan sits.
+     */
     const rasterizeText = (family: string = FONT_FAMILY): Mask => {
       const off = newCanvas(width, height);
       const octx = off.getContext("2d", { willReadFrequently: true });
@@ -276,16 +282,58 @@ export function BinaryMark({
 
       octx.fillStyle = "#fff";
       octx.textAlign = "center";
-      octx.textBaseline = "middle";
-      let fontSize = Math.min(height * 1.1, width * 0.6);
+
+      // Ink extents scale linearly with the font size, so one probe at a
+      // round size yields the scale factors for both axes.
+      const probe = 200;
+      octx.font = `700 ${probe}px ${family}`;
+      const probeMetrics = octx.measureText(text);
+      const probeInkH =
+        probeMetrics.actualBoundingBoxAscent +
+        probeMetrics.actualBoundingBoxDescent;
+      const probeInkW =
+        probeMetrics.actualBoundingBoxLeft +
+        probeMetrics.actualBoundingBoxRight;
+
+      let fontSize = probe;
+      if (probeInkH > 0 && probeInkW > 0) {
+        // Fill the stage: 80% of the height (6% headroom on top, the rest
+        // of the slack left under the letters for the caption) and 90% of
+        // the width — whichever constraint fits first.
+        fontSize *= Math.min(
+          (height * 0.8) / probeInkH,
+          (width * 0.9) / probeInkW,
+        );
+      } else {
+        // No ink metrics (older engine): fall back to advance-width fit.
+        fontSize = Math.min(height * 1.1, width * 0.6);
+        octx.font = `700 ${fontSize}px ${family}`;
+        const advance = octx.measureText(text).width;
+        if (advance > width * 0.85 && advance > 0) {
+          fontSize *= (width * 0.85) / advance;
+        }
+      }
+
       octx.font = `700 ${fontSize}px ${family}`;
       const metrics = octx.measureText(text);
-      const maxWidth = width * 0.85;
-      if (metrics.width > maxWidth && metrics.width > 0) {
-        fontSize *= maxWidth / metrics.width;
-        octx.font = `700 ${fontSize}px ${family}`;
+      const asc = metrics.actualBoundingBoxAscent;
+      const desc = metrics.actualBoundingBoxDescent;
+      const left = metrics.actualBoundingBoxLeft;
+      const right = metrics.actualBoundingBoxRight;
+      const inkH = asc + desc;
+      const inkW = left + right;
+
+      if (inkH > 0 && inkW > 0) {
+        // Centre the *ink box* (not the em box) inside its band so the
+        // letters sit exactly where the eye expects them.
+        octx.textBaseline = "alphabetic";
+        const baselineY = height * 0.06 + inkH / 2 + (asc - desc) / 2;
+        const anchorX = width / 2 - (right - left) / 2;
+        octx.fillText(text, anchorX, baselineY);
+      } else {
+        octx.textBaseline = "middle";
+        octx.fillText(text, width / 2, height / 2);
       }
-      octx.fillText(text, width / 2, height / 2);
       return {
         data: octx.getImageData(0, 0, width, height).data,
         transparent: true,
@@ -699,7 +747,7 @@ export function BinaryMark({
           <canvas ref={canvasRef} className="block h-full w-full" />
         </div>
         {caption && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-[16%]">
+          <div className="pointer-events-none absolute inset-x-0 bottom-[4%]">
             {caption}
           </div>
         )}
