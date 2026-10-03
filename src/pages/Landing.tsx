@@ -43,7 +43,7 @@ export default function Landing() {
                   // under the wordmark and tilting with the mark. The
                   // brand X and R pick up the accent red.
                   <p className="text-center text-[10px] italic tracking-[0.16em] text-neutral-600 sm:text-[12px] sm:tracking-[0.2em]">
-                    <span className="text-xr-red">X</span>tend Your{" "}
+                    <span className="text-xr-red">X</span>tend your{" "}
                     <span className="text-xr-red">R</span>eality
                   </p>
                 }
