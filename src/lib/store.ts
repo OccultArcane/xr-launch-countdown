@@ -15,23 +15,25 @@ export const SITE = {
   /** What the binary mark spells. */
   maskText: "xr",
   /**
-   * Logo used as the mask for the binary mark. Save your artwork into
-   * /public (e.g. "xr-mask.png" — transparent PNG or shape on a flat
-   * background) and point this at it; leave "" to fall back to maskText.
+   * Logo used as the mask for the binary mark when no font mask loads.
+   * Save your artwork into /public (e.g. "xr-mask.png" — transparent PNG
+   * or shape on a flat background) and point this at it; leave "" to fall
+   * back to maskText.
    */
   maskImage: "/xr-mask.png",
   /**
-   * Stand-in silhouette used until maskImage exists, so the mark always
-   * masks to a styled xr shape (currently a drawn thorned/dripping
-   * blackletter set in the Midnight Grave style).
+   * Stand-in silhouette used until a font or logo mask exists, so the
+   * mark always masks to a styled xr shape (currently a drawn
+   * thorned/dripping blackletter set in the Midnight Grave style).
    */
   maskImageFallback: "/xr-mask-fallback.svg",
   /**
-   * Optional display font file for the text mask — e.g. "/gorewild.ttf"
-   * after dropping the font into /public. Leave "" to use the fallback
-   * artwork above.
+   * Display font the binary mask is drawn in — drop "darkgone.ttf" into
+   * /public (exact filename) and the mask becomes the wordmark set in
+   * Darkgone. Tried first; if the file is missing or unreadable it falls
+   * through to maskImage, then maskImageFallback. Leave "" for no font mask.
    */
-  maskFontFile: "",
+  maskFontFile: "/darkgone.ttf",
   /** Your IMVU store URL — used as the fallback link on a product page. */
   storeUrl: "https://www.imvu.com/store/",
 };

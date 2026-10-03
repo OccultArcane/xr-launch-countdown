@@ -122,13 +122,17 @@ function dominantColor(
 }
 
 type BinaryMarkProps = {
-  /** Text the mark spells. Used when no image is supplied or it fails. */
+  /** Text the mark spells. Used when nothing above masks it. */
   text?: string;
-  /** Font file the text mask is drawn in, e.g. "/gorewild.ttf". */
+  /**
+   * Display font file the mask is drawn in, e.g. "/darkgone.ttf" — tried
+   * first, so the wordmark in that typeface is the mask whenever the file
+   * loads.
+   */
   fontSrc?: string;
-  /** Logo image used as the mask (transparent PNG or shape on flat bg). */
+  /** Logo image used as the mask when no font mask loads. */
   imageSrc?: string;
-  /** Tried when `imageSrc` is missing or fails to load. */
+  /** Tried when the font and `imageSrc` are missing or fail to load. */
   fallbackImageSrc?: string;
 };
 
@@ -357,16 +361,17 @@ export function BinaryMark({
 
       cell = width < 560 ? 12 : width < 900 ? 14 : 15;
 
+      // Font mask wins: the wordmark set in the display font (Darkgone) is
+      // the silhouette whenever its file is present.
       let mask: Mask | null = null;
-      if (imageSrc) {
-        mask = await rasterizeImage(imageSrc);
+      if (fontSrc) {
+        const family = await loadMaskFont(fontSrc);
         if (id !== buildId) return; // a newer rebuild superseded this one
-      }
-      let family: string | null = null;
-      if (!mask && fontSrc) {
-        family = await loadMaskFont(fontSrc);
-        if (id !== buildId) return;
         if (family) mask = rasterizeText(family);
+      }
+      if (!mask && imageSrc) {
+        mask = await rasterizeImage(imageSrc);
+        if (id !== buildId) return;
       }
       if (!mask && fallbackImageSrc) {
         mask = await rasterizeImage(fallbackImageSrc);
