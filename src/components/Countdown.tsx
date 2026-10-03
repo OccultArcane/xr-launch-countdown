@@ -54,10 +54,10 @@ export function Countdown() {
   return (
     <section aria-label="drop countdown" className="w-full max-w-3xl">
       <div className="mb-5 flex items-baseline justify-between text-[10px] uppercase tracking-[0.35em]">
-        <span className="text-neutral-400">
+        <span className="text-[#f84848]">
           {dropDay ? "drop day" : "next drop"}
         </span>
-        <span className="tabular-nums text-neutral-500">{dateLabel}</span>
+        <span className="tabular-nums text-[#f84848]">{dateLabel}</span>
       </div>
 
       <div className="grid grid-cols-4 border-y border-white/10">

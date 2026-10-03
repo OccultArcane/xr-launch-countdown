@@ -1,14 +1,15 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
-import { PRODUCTS, type Product } from "@/lib/store";
+import { fetchLatestProducts } from "@/lib/productsFeed";
+import { PRODUCTS, SITE, type Product } from "@/lib/store";
+
+const TILE_CLASS =
+  "glitch-hover group flex aspect-square w-[144px] flex-col border border-white/10 bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]";
 
 function Tile({ product }: { product: Product }) {
-  return (
-    <Link
-      to={`/products/${product.id}`}
-      className="glitch-hover group flex aspect-square w-[144px] flex-col border border-white/10 bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]"
-    >
+  const body = (
+    <>
       <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] sm:text-[9px]">
         <span className="flex items-center gap-1.5 text-neutral-300">
           <span
@@ -20,7 +21,7 @@ function Tile({ product }: { product: Product }) {
         <span className="truncate text-neutral-500">{product.category}</span>
       </div>
 
-      {/* Image slot — set product.image in src/lib/store.ts to fill it */}
+      {/* Image slot — filled from product.image (store config or live feed) */}
       <div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
         {product.image && (
           <img
@@ -46,6 +47,27 @@ function Tile({ product }: { product: Product }) {
           →
         </span>
       </div>
+    </>
+  );
+
+  // Catalog items open their detail page; live-feed items have no local
+  // page, so they go straight to the IMVU store in a new tab.
+  if (!PRODUCTS.some((item) => item.id === product.id)) {
+    return (
+      <a
+        href={product.url || SITE.storeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={TILE_CLASS}
+      >
+        {body}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={`/products/${product.id}`} className={TILE_CLASS}>
+      {body}
     </Link>
   );
 }
@@ -63,12 +85,31 @@ function Stack({ items, className }: { items: Product[]; className: string }) {
 /**
  * The catalog beside the mark: square tiles stacked on top of each other —
  * a column on each side on desktop, one full stack under it on mobile.
+ * The tiles fill from the live feed (latest 4 by creation date) and keep
+ * the built-in catalog whenever the feed is unavailable.
  */
 export function MarkWithProducts({ children }: { children: ReactNode }) {
-  const mid = Math.ceil(PRODUCTS.length / 2);
-  const left = PRODUCTS.slice(0, mid);
-  const right = PRODUCTS.slice(mid);
-  const hasProducts = PRODUCTS.length > 0;
+  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      // Non-empty only when the feed answered with usable rows; the tiles
+      // keep the built-in catalog otherwise.
+      const latest = await fetchLatestProducts(SITE.productsApi);
+      if (!cancelled && latest.length > 0) setProducts(latest);
+    };
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const mid = Math.ceil(products.length / 2);
+  const left = products.slice(0, mid);
+  const right = products.slice(mid);
+  const hasProducts = products.length > 0;
 
   return (
     <motion.section
@@ -91,7 +132,7 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
 
         {hasProducts && (
           <div className="order-2 grid w-fit grid-cols-1 gap-2.5 lg:hidden">
-            {PRODUCTS.map((product) => (
+            {products.map((product) => (
               <Tile key={product.id} product={product} />
             ))}
           </div>
