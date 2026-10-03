@@ -7,12 +7,14 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { SITE } from "@/lib/store";
 
 /**
- * Support channels — full URLs. Add Discord here once its server invite
- * exists; the "/" separator renders automatically between entries.
+ * Support channels — full URLs; the "/" separator renders between
+ * entries. An empty href renders the name dimmed as inactive (Discord:
+ * drop its invite in when the server exists and it goes live).
  */
 const SUPPORT_SOCIALS = [
-  { name: "Pinterest", href: "https://uk.pinterest.com/MI5vu/" },
+  { name: "Pinterest", href: "https://www.pinterest.com/xrimvu" },
   { name: "Instagram", href: "https://www.instagram.com/xr.imvu/" },
+  { name: "Discord", href: "" },
 ];
 
 export default function Landing() {
@@ -59,20 +61,32 @@ export default function Landing() {
             className="flex flex-wrap items-center justify-center gap-x-3 text-[13px] tracking-[0.12em]"
           >
             {SUPPORT_SOCIALS.map((social, index) => (
-              <Fragment key={social.href}>
+              <Fragment key={social.name}>
                 {index > 0 && (
                   <span aria-hidden="true" className="text-neutral-600">
                     /
                   </span>
                 )}
-                <a
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glitch-hover no-underline text-neutral-300 transition-colors hover:text-white"
-                >
-                  {social.name}
-                </a>
+                {social.href ? (
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="glitch-hover no-underline text-neutral-300 transition-colors hover:text-white"
+                  >
+                    {social.name}
+                  </a>
+                ) : (
+                  // No invite yet — dulled and unclickable so it reads
+                  // as inactive until its href is filled in.
+                  <span
+                    aria-disabled="true"
+                    title="coming soon"
+                    className="cursor-default select-none text-neutral-600"
+                  >
+                    {social.name}
+                  </span>
+                )}
               </Fragment>
             ))}
           </motion.nav>
