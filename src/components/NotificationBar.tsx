@@ -8,7 +8,8 @@ import { DEFAULT_ANNOUNCEMENT, type Announcement } from "@/lib/store";
  * The header's pop-down notification: slides out from underneath the
  * header row with the latest announcement — a live Discord post when the
  * bot feed is configured (src/convex/notifications.ts), the built-in
- * store notice otherwise. Dismissible for the session.
+ * store notice otherwise. Dismissible for the session (it reappears on
+ * reload).
  */
 export function NotificationBar() {
   const [announcement, setAnnouncement] = useState<Announcement | null>(

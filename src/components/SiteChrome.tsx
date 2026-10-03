@@ -48,7 +48,7 @@ export function SiteHeader() {
         </nav>
       </div>
 
-      {/* Pop-down notification, directly beneath the header row */}
+      {/* Pop-down notification — slides out from under the header row */}
       <NotificationBar />
     </header>
   );
