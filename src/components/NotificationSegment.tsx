@@ -68,7 +68,7 @@ export function NotificationSegment() {
           role="status"
           aria-live="polite"
         >
-          <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-6 py-2.5">
+          <div className="mx-auto flex w-full max-w-5xl items-center justify-center gap-3 px-6 py-2.5">
             <span className="flex shrink-0 items-center gap-1.5 text-[9px] uppercase tracking-[0.25em] text-xr-red sm:text-[10px]">
               <span
                 className="blink-dot h-1.5 w-1.5 rounded-full bg-xr-red"
@@ -76,7 +76,7 @@ export function NotificationSegment() {
               />
               notice
             </span>
-            <p className="min-w-0 flex-1 truncate text-[10px] tracking-[0.08em] text-neutral-400 sm:text-[11px]">
+            <p className="min-w-0 truncate text-[10px] tracking-[0.08em] text-neutral-400 sm:text-[11px]">
               {/* Full line for screen readers; the typing is visual only. */}
               <span className="sr-only">{text}</span>
               <span aria-hidden="true">{shown}</span>
