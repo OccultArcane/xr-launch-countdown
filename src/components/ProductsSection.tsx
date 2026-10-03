@@ -23,14 +23,14 @@ function Tile({ product }: { product: Product }) {
         <span className="truncate text-neutral-500">{product.category}</span>
       </div>
 
-      {/* Image slot — filled from product.image (store config or live feed) */}
-      <div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
+      {/* Image slot — the thumbnail fills the whole slot, cropping to fit */}
+      <div className="mt-3 min-h-0 flex-1 overflow-hidden">
         {product.image && (
           <img
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="max-h-full max-w-full object-contain"
+            className="h-full w-full object-cover"
           />
         )}
       </div>

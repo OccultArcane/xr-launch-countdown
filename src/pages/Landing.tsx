@@ -9,6 +9,7 @@ import { SITE } from "@/lib/store";
 const SUPPORT_SOCIALS = [
   { name: "Pinterest", domain: "pinterest.com" },
   { name: "Instagram", domain: "instagram.com" },
+  { name: "Discord", domain: "discord.com" },
 ];
 
 export default function Landing() {
