@@ -48,6 +48,27 @@ export const SITE = {
   storeUrl: "https://www.imvu.com/store/",
 };
 
+/** One header notification — a live Discord post or the built-in notice. */
+export type Announcement = {
+  text: string;
+  /** Deep link to the announcement; "" renders the text on its own. */
+  url: string;
+  timestamp: string;
+  source: "discord" | "default";
+};
+
+/**
+ * Shown by the header notification until the Discord feed (see
+ * src/convex/notifications.ts) returns a live announcement, and
+ * whenever Discord is unconfigured or unreachable.
+ */
+export const DEFAULT_ANNOUNCEMENT: Announcement = {
+  text: "the xr shop is live — browse the latest drop",
+  url: "https://www.imvu.com/store/",
+  timestamp: "",
+  source: "default",
+};
+
 export type Product = {
   /** URL slug for the detail page: /products/<id> */
   id: string;
