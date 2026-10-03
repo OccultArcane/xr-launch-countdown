@@ -99,10 +99,17 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
     const load = async () => {
       // A URL in SITE.productsApi is fetched directly; otherwise the
       // Convex action scrapes the creator's IMVU shop server-side. Either
-      // way, empty results leave the built-in catalog in place.
+      // way, empty results leave the built-in catalog in place — but a
+      // failure is logged so a silently-stale catalog can be diagnosed.
       const latest = SITE.productsApi
         ? await fetchLatestProducts(SITE.productsApi)
-        : await runImvuFeed().catch(() => [] as Product[]);
+        : await runImvuFeed().catch((error: unknown) => {
+            console.error(
+              "IMVU feed unavailable — keeping the built-in catalog",
+              error,
+            );
+            return [] as Product[];
+          });
       if (!cancelled && latest.length > 0) setProducts(latest);
     };
     void load();
