@@ -11,6 +11,12 @@ type Column = {
   /** Rows the stream falls per second. */
   speed: number;
   phase: number;
+  /** Red band: index window and timing that lights it as it flows down. */
+  band: number;
+  bandLen: number;
+  redPhase: number;
+  redPeriod: number;
+  redOn: number;
 };
 
 type Cell = {
@@ -175,7 +181,7 @@ const loadMaskFont = async (url: string): Promise<string | null> => {
 /**
  * The blackletter "xr" mark built from tiny digits: Matrix-style streams
  * fall downward through the silhouette — digits only, nothing outside the
- * mask — punctuated by rare red sparks and glitch bursts.
+ * mask — threaded by flowing red bands and sparks, plus glitch bursts.
  */
 export function BinaryMark({
   text = "xr",
@@ -485,6 +491,11 @@ export function BinaryMark({
           bits,
           speed: 4 + Math.random() * 7,
           phase: Math.random() * 32,
+          band: Math.floor(Math.random() * gridRows),
+          bandLen: 6 + Math.floor(Math.random() * 9),
+          redPhase: Math.random() * 48,
+          redPeriod: 22 + Math.random() * 26,
+          redOn: 4 + Math.random() * 4,
         };
       };
 
@@ -523,8 +534,8 @@ export function BinaryMark({
             phase: Math.random() * Math.PI * 2,
             amp: 0.2 + Math.random() * 0.5,
             speed: 0.35 + Math.random() * 1.1,
-            redAt: reduceMotion ? 0 : now + 30000 + Math.random() * 180000,
-            redDur: 350 + Math.random() * 350,
+            redAt: reduceMotion ? 0 : now + 4000 + Math.random() * 16000,
+            redDur: 600 + Math.random() * 600,
           });
         }
       }
@@ -579,6 +590,13 @@ export function BinaryMark({
         let ch = c.col.bits[idx];
         if (c.flip) ch = ch === "0" ? "1" : "0";
 
+        // Red flows through the streams: a band of the column lights up and
+        // rides the falling digits down through the letterforms.
+        const streamRed =
+          (t + c.col.redPhase) % c.col.redPeriod < c.col.redOn &&
+          (((idx - c.col.band) % gridRows) + gridRows) % gridRows <
+            c.col.bandLen;
+
         let x = c.x;
         let y = c.y;
         let alpha = c.alpha;
@@ -595,14 +613,13 @@ export function BinaryMark({
           if (Math.random() < 0.06) c.flip = !c.flip;
         }
 
-        // Rare red spark — the accent only flickers through a few digits,
-        // so the monogram reads white-and-silver at a glance.
-        let red = false;
+        // Sparks ride on top of the bands: quick individual flashes.
+        let red = streamRed;
         if (c.redAt !== 0) {
           if (nowMs >= c.redAt + c.redDur) {
-            c.redAt = nowMs + 90000 + Math.random() * 180000;
-          } else {
-            red = nowMs >= c.redAt;
+            c.redAt = nowMs + 15000 + Math.random() * 30000;
+          } else if (nowMs >= c.redAt) {
+            red = true;
           }
         }
 
