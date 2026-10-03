@@ -131,7 +131,7 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
           <Stack items={left} className="order-1 hidden lg:grid" />
         )}
 
-        {/* The mark: 0s and 1s assembling your logo silhouette */}
+        {/* The mark: x's and r's assembling your logo silhouette */}
         <div className="order-1 h-[clamp(240px,42vh,440px)] w-full lg:order-2 lg:w-auto lg:flex-1">
           {children}
         </div>

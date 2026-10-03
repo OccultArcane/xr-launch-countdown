@@ -5,9 +5,9 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
-/** One vertical stream of digits — a column's bits scrolling downward. */
+/** One vertical stream of glyphs — a column's x's and r's scrolling down. */
 type Column = {
-  bits: string[];
+  glyphs: string[];
   /** Rows the stream falls per second. */
   speed: number;
   phase: number;
@@ -22,11 +22,11 @@ type Column = {
 type Cell = {
   x: number;
   y: number;
-  /** The stream this cell samples its digit from. */
+  /** The stream this cell samples its glyph from. */
   col: Column;
   /** Row index within that stream. */
   row: number;
-  /** Glitch scramble: invert the streamed digit. */
+  /** Glitch scramble: swap the streamed glyph. */
   flip: boolean;
   alpha: number;
   /** Bloom is fixed per cell so the glow never flickers. */
@@ -179,9 +179,10 @@ const loadMaskFont = async (url: string): Promise<string | null> => {
 };
 
 /**
- * The blackletter "xr" mark built from tiny digits: Matrix-style streams
- * fall downward through the silhouette — digits only, nothing outside the
- * mask — threaded by flowing red bands and sparks, plus glitch bursts.
+ * The blackletter "xr" mark built from tiny x's and r's: Matrix-style
+ * streams fall downward through the silhouette — glyphs only, nothing
+ * outside the mask — threaded by flowing red bands and sparks, plus glitch
+ * bursts.
  */
 export function BinaryMark({
   text = "xr",
@@ -226,10 +227,10 @@ export function BinaryMark({
     };
 
     /**
-     * Digits are pre-rendered once — optionally with a baked silver glow —
+     * Glyphs are pre-rendered once — optionally with a baked silver glow —
      * and blitted per frame, so thousands of them stay cheap to draw.
      */
-    const digitSprite = (ch: string, color: string, glow: boolean) => {
+    const glyphSprite = (ch: string, color: string, glow: boolean) => {
       const key = `${ch}|${color}|${glow ? 1 : 0}`;
       const hit = sprites.get(key);
       if (hit) return hit;
@@ -417,7 +418,7 @@ export function BinaryMark({
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Tiny digits on a tight grid: thousands of them build the monogram.
+      // Tiny glyphs on a tight grid: thousands of them build the monogram.
       cell = width < 560 ? 6 : width < 900 ? 7 : 8;
       sprites.clear();
 
@@ -441,7 +442,7 @@ export function BinaryMark({
 
       /** Coverage 0–1 at a point: what fraction of this spot is the mark. */
       const coverage = (px: number, py: number) => {
-        // Average a few probes so the big digits track the silhouette closely.
+        // Average a few probes so the big glyphs track the silhouette closely.
         const r = Math.max(1, Math.floor(cell / 4));
         const probes = [
           [0, 0],
@@ -475,20 +476,20 @@ export function BinaryMark({
 
       gridRows = Math.max(1, Math.ceil(height / cell));
 
-      // One digit stream per column: bits fall downward and repeatedly carry
-      // the ASCII bytes for X (01011000) and R (01010010) through the shape.
+      // One glyph stream per column: x's and r's fall downward and
+      // periodically spell repeating xr / rx motifs through the shape.
       const makeColumn = (): Column => {
-        const bits: string[] = Array.from({ length: gridRows }, () =>
-          Math.random() < 0.5 ? "0" : "1",
+        const glyphs: string[] = Array.from({ length: gridRows }, () =>
+          Math.random() < 0.5 ? "x" : "r",
         );
         let pos = Math.floor(Math.random() * 8);
         while (pos + 8 <= gridRows) {
-          const byte = Math.random() < 0.5 ? "01011000" : "01010010";
-          for (let k = 0; k < 8; k++) bits[pos + k] = byte[k];
+          const motif = Math.random() < 0.5 ? "xrxrxrxr" : "rxrxrxrx";
+          for (let k = 0; k < 8; k++) glyphs[pos + k] = motif[k];
           pos += 10 + Math.floor(Math.random() * 14);
         }
         return {
-          bits,
+          glyphs,
           speed: 4 + Math.random() * 7,
           phase: Math.random() * 32,
           band: Math.floor(Math.random() * gridRows),
@@ -511,10 +512,10 @@ export function BinaryMark({
           if (cov >= 0.55) {
             alpha = 0.6 + Math.random() * 0.4;
           } else if (cov >= 0.28) {
-            // Edge cells are kept so the digits hug the outline closely.
+            // Edge cells are kept so the glyphs hug the outline closely.
             alpha = 0.3 + Math.random() * 0.3;
           }
-          // Nothing outside the mask — only the logo shows 0s and 1s.
+          // Nothing outside the mask — only the logo shows x's and r's.
           if (alpha <= 0) continue;
 
           let col = columns.get(gx);
@@ -549,7 +550,7 @@ export function BinaryMark({
       const t = nowMs / 1000;
       ctx.clearRect(0, 0, width, height);
 
-      /** Blit a pre-rendered digit — far cheaper than filling text per frame. */
+      /** Blit a pre-rendered glyph — far cheaper than filling text per frame. */
       const ink = (
         ch: string,
         x: number,
@@ -558,12 +559,12 @@ export function BinaryMark({
         glow: boolean,
         color: string = SILVER,
       ) => {
-        const spr = digitSprite(ch, color, glow);
+        const spr = glyphSprite(ch, color, glow);
         ctx.globalAlpha = Math.min(1, alpha);
         ctx.drawImage(spr, x - spr.width / 2, y - spr.height / 2);
       };
 
-      // Periodic glitch burst: torn bands, chromatic split, scrambled digits.
+      // Periodic glitch burst: torn bands, chromatic split, scrambled glyphs.
       let glitching = false;
       if (!reduceMotion) {
         if (nextGlitch === 0) nextGlitch = nowMs + 2500 + Math.random() * 5000;
@@ -584,14 +585,14 @@ export function BinaryMark({
       }
 
       for (const c of cells) {
-        // Sample this cell's digit from its column's falling stream.
+        // Sample this cell's glyph from its column's falling stream.
         const off = Math.floor(t * c.col.speed + c.col.phase);
         const idx = (((c.row - off) % gridRows) + gridRows) % gridRows;
-        let ch = c.col.bits[idx];
-        if (c.flip) ch = ch === "0" ? "1" : "0";
+        let ch = c.col.glyphs[idx];
+        if (c.flip) ch = ch === "x" ? "r" : "x";
 
         // Red flows through the streams: a band of the column lights up and
-        // rides the falling digits down through the letterforms.
+        // rides the falling glyphs down through the letterforms.
         const streamRed =
           (t + c.col.redPhase) % c.col.redPeriod < c.col.redOn &&
           (((idx - c.col.band) % gridRows) + gridRows) % gridRows <
@@ -626,7 +627,7 @@ export function BinaryMark({
         if (alpha < 0.015) continue;
 
         if (glitching) {
-          // Chromatic split: red and cyan ghosts either side of the digit.
+          // Chromatic split: red and cyan ghosts either side of the glyph.
           const ghost = Math.min(1, alpha * 0.85);
           ink(ch, x - 2.5, y, ghost, false, SPARK_RED);
           ink(ch, x + 2.5, y, ghost, false, GHOST_CYAN);
