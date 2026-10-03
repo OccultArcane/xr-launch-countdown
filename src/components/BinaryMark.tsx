@@ -306,8 +306,8 @@ export function BinaryMark({
       if (maxX < 0) return null; // nothing to mask — fall back to text
 
       // A hair of margin so edge digits are not clipped by the crop.
-      const padX = Math.round((maxX - minX + 1) * 0.03) + 1;
-      const padY = Math.round((maxY - minY + 1) * 0.03) + 1;
+      const padX = Math.round((maxX - minX + 1) * 0.015) + 1;
+      const padY = Math.round((maxY - minY + 1) * 0.015) + 1;
       const cx = Math.max(0, minX - padX);
       const cy = Math.max(0, minY - padY);
       const cw = Math.min(sw - cx, maxX + 1 + padX - cx);
@@ -416,11 +416,11 @@ export function BinaryMark({
           const cov = coverage(gx, gy);
 
           let alpha = 0;
-          if (cov >= 0.62) {
+          if (cov >= 0.55) {
             alpha = 0.55 + Math.random() * 0.45;
-          } else if (cov >= 0.42) {
-            // Silhouette edge: dimmer digits keep the outline ragged, not leaky.
-            alpha = 0.2 + Math.random() * 0.25;
+          } else if (cov >= 0.28) {
+            // Edge cells are kept so the digits hug the outline closely.
+            alpha = 0.3 + Math.random() * 0.3;
           }
           // Nothing outside the mark — the shape stays fully masked.
           if (alpha <= 0) continue;

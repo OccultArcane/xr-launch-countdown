@@ -1,14 +1,65 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   width="1024"
-  height="512"
-  viewBox="0 0 1024 512"
+  height="1024"
+  viewBox="0 0 1024 1024"
   role="img"
-  aria-label="xr bar mask"
+  aria-label="xr dripping blackletter monogram"
 >
-  <!-- Interim stand-in silhouette for the binary mark mask: a solid
-       horizontal bar centred on transparent space (the transparent margin
-       is required so the edge-trimmer stops at the bar).
-       For the exact artwork, save the real image as /xr-mask.png. -->
-  <rect x="192" y="192" width="640" height="128" fill="#ffffff" />
+  <!-- Interim stand-in silhouette for the binary mark mask, drawn in the
+       "Midnight Grave" style: angular blackletter X and R with curved
+       thorn barbs, tapering ink drips and falling droplets.
+       For the exact letterforms, drop the real font file into /public
+       and set SITE.maskFontFile. -->
+  <g fill="#ffffff">
+    <!-- X: heavy stroke, top-left down to bottom-right -->
+    <path
+      d="M126 96 L138 180 L176 252 L224 292 L232 360 L282 458 L334 556 L388 650 L420 712 L474 704 L438 628 L392 540 L346 452 L300 364 L268 300 L252 276 L210 190 L196 110 Z"
+    />
+    <!-- X: crossing stroke, top-right down to bottom-left -->
+    <path
+      d="M352 96 L336 180 L296 268 L256 360 L212 458 L166 556 L118 652 L96 712 L156 708 L196 630 L244 542 L288 454 L334 364 L376 276 L416 192 L438 112 Z"
+    />
+    <!-- X: lozenge at the crossing -->
+    <path d="M300 372 L346 416 L300 462 L254 416 Z" />
+
+    <!-- X: curved thorn barbs -->
+    <path d="M146 128 Q118 74 128 34 Q146 84 176 112 Z" />
+    <path d="M196 262 Q150 246 128 214 Q158 274 206 292 Z" />
+    <path d="M330 470 Q384 462 424 430 Q388 494 336 512 Z" />
+    <path d="M410 130 Q436 76 424 36 Q404 88 376 116 Z" />
+    <path d="M214 470 Q170 462 138 432 Q166 494 220 510 Z" />
+
+    <!-- X: ink drips -->
+    <path d="M427 700 Q431 780 436 844 L441 852 Q447 786 453 700 Z" />
+    <path d="M112 704 Q116 800 120 880 L125 890 Q131 806 140 704 Z" />
+    <path d="M289 456 Q293 540 296 610 L301 620 Q306 546 311 456 Z" />
+    <ellipse cx="124" cy="918" rx="8" ry="11" />
+
+    <!-- R: heavy stem with angled foot -->
+    <path
+      d="M556 60 L636 86 L648 190 L656 306 L664 424 L672 544 L682 644 L724 706 L646 724 L624 646 L610 534 L600 414 L592 296 L582 184 L540 116 Z"
+    />
+    <!-- R: angular bowl ring (outer contour + counter, opposite winding) -->
+    <path
+      d="M620 92 L716 70 L838 78 L912 138 L894 244 L920 320 L872 396 L790 448 L694 462 L640 438 Z M696 404 L760 420 L822 384 L846 306 L822 232 L834 164 L762 136 L696 142 Z"
+    />
+    <!-- R: kicking leg -->
+    <path
+      d="M666 440 L758 464 L846 552 L928 672 L968 720 L906 704 L836 612 L754 522 L660 476 Z"
+    />
+
+    <!-- R: curved thorn barbs -->
+    <path d="M576 120 Q560 62 570 22 Q588 74 614 106 Z" />
+    <path d="M846 120 Q890 76 916 36 Q902 96 864 126 Z" />
+    <path d="M904 300 Q956 284 988 250 Q952 316 906 336 Z" />
+    <path d="M846 596 Q894 640 918 684 Q874 648 826 620 Z" />
+
+    <!-- R: ink drips -->
+    <path d="M644 720 Q648 812 652 900 L658 910 Q664 818 676 720 Z" />
+    <path d="M747 456 Q751 536 754 604 L759 614 Q765 542 773 456 Z" />
+    <path d="M852 630 Q856 722 860 806 L865 816 Q871 728 879 630 Z" />
+    <path d="M636 684 Q639 744 641 796 L646 804 Q651 750 656 684 Z" />
+    <ellipse cx="657" cy="938" rx="8" ry="11" />
+  </g>
 </svg>

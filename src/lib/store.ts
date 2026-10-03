@@ -22,8 +22,8 @@ export const SITE = {
   maskImage: "/xr-mask.png",
   /**
    * Stand-in silhouette used until maskImage exists, so the mark always
-   * masks to a shape (currently a drawn horizontal bar matching the last
-   * image mask request).
+   * masks to a styled xr shape (currently a drawn thorned/dripping
+   * blackletter set in the Midnight Grave style).
    */
   maskImageFallback: "/xr-mask-fallback.svg",
   /**
