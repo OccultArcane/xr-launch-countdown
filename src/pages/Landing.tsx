@@ -33,12 +33,20 @@ export default function Landing() {
           {/* Mark, catalog and countdown kept tight together */}
           <div className="flex w-full flex-col items-center gap-6 sm:gap-8">
             <MarkWithProducts>
-              <BinaryMark
-                text={SITE.maskText}
-                fontSrc={SITE.maskFontFile || undefined}
-                imageSrc={SITE.maskImage || undefined}
-                fallbackImageSrc={SITE.maskImageFallback || undefined}
-              />
+              <div className="flex h-full w-full flex-col items-center">
+                <div className="min-h-0 w-full flex-1">
+                  <BinaryMark
+                    text={SITE.maskText}
+                    fontSrc={SITE.maskFontFile || undefined}
+                    imageSrc={SITE.maskImage || undefined}
+                    fallbackImageSrc={SITE.maskImageFallback || undefined}
+                  />
+                </div>
+                {/* Slogan beneath the mark — quoted and italic */}
+                <p className="mt-2 shrink-0 text-center text-[10px] italic tracking-[0.16em] text-neutral-400 sm:text-[12px] sm:tracking-[0.2em]">
+                  &ldquo;Beyond reality, wear the other you.&rdquo;
+                </p>
+              </div>
             </MarkWithProducts>
 
             {/* Countdown to the weekly Friday drop */}
