@@ -27,7 +27,7 @@ export default function Landing() {
       <SiteHeader />
 
       <main className="flex flex-1 items-center justify-center px-6 py-6">
-        <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-8 sm:gap-10">
+        <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 sm:gap-8">
           <h1 className="sr-only">xr — IMVU storefront</h1>
 
           {/* Mark, catalog and countdown kept tight together */}
