@@ -1,5 +1,4 @@
 import { Fragment } from "react";
-import { NotificationBar } from "./NotificationBar";
 
 /** Supported creators, each linked to their IMVU shop by manufacturers id. */
 const HEADER_LINKS = [
@@ -47,9 +46,6 @@ export function SiteHeader() {
           ))}
         </nav>
       </div>
-
-      {/* Pop-down notification — slides out from under the header row */}
-      <NotificationBar />
     </header>
   );
 }
