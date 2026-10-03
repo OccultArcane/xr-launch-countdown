@@ -28,12 +28,13 @@ export const SITE = {
    */
   maskImageFallback: "/xr-mask-fallback.svg",
   /**
-   * Display font the binary mask is drawn in — drop "darkgone.ttf" into
-   * /public (exact filename) and the mask becomes the wordmark set in
-   * Darkgone. Tried first; if the file is missing or unreadable it falls
-   * through to maskImage, then maskImageFallback. Leave "" for no font mask.
+   * Display font the binary mask is drawn in — Deutsch Gothic by James
+   * Fordyce (100% free; licence text ships as /public/DEUTSCH.TXT). The
+   * mask is the wordmark "xr" set in this face; tried first, falling
+   * through to maskImage, then maskImageFallback if the file is missing
+   * or unreadable. Leave "" for no font mask.
    */
-  maskFontFile: "/darkgone.ttf",
+  maskFontFile: "/deutsch-gothic.ttf",
   /** Your IMVU store URL — used as the fallback link on a product page. */
   storeUrl: "https://www.imvu.com/store/",
 };

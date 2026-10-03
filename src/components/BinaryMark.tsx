@@ -125,9 +125,9 @@ type BinaryMarkProps = {
   /** Text the mark spells. Used when nothing above masks it. */
   text?: string;
   /**
-   * Display font file the mask is drawn in, e.g. "/darkgone.ttf" — tried
-   * first, so the wordmark in that typeface is the mask whenever the file
-   * loads.
+   * Display font file the mask is drawn in, e.g. "/deutsch-gothic.ttf" —
+   * tried first, so the wordmark in that typeface is the mask whenever
+   * the file loads.
    */
   fontSrc?: string;
   /** Logo image used as the mask when no font mask loads. */
@@ -361,8 +361,8 @@ export function BinaryMark({
 
       cell = width < 560 ? 12 : width < 900 ? 14 : 15;
 
-      // Font mask wins: the wordmark set in the display font (Darkgone) is
-      // the silhouette whenever its file is present.
+      // Font mask wins: the wordmark set in the configured display font
+      // (Deutsch Gothic) is the silhouette whenever its file is present.
       let mask: Mask | null = null;
       if (fontSrc) {
         const family = await loadMaskFont(fontSrc);
