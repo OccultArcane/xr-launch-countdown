@@ -13,6 +13,8 @@ export type ShopRow = {
   image: string;
   url: string;
   created: string;
+  /** Catalog type — "" until read off the product page. */
+  category: string;
 };
 
 /** Newest-first listing URL for a creator (IMVU "manufacturer"). */
@@ -68,8 +70,41 @@ export function parseImvuShopPage(html: string): ShopRow[] {
       image,
       url: `https://www.imvu.com/shop/product.php?products_id=${id}`,
       created: "",
+      category: "",
     });
   }
 
   return rows;
+}
+
+/**
+ * Reads a product's catalog type off its page breadcrumb —
+ * `IMVU Home > Catalog > Body > Body for Male > Hair > Corn Rows` — and
+ * returns the first level deep enough to name what the item actually is
+ * ("Hair"), so tiles can show what the product is. Shallower taxonomies
+ * fall back to their deepest label (e.g. two levels → "Earrings"). ""
+ * when the page carries no breadcrumb.
+ */
+export function parseProductCategory(html: string): string {
+  // Scope to the breadcrumb when present; the whole page otherwise.
+  const scope =
+    html.match(/<div id="breadcrumb">([\s\S]*?)<\/div>/)?.[1] ?? html;
+  const levels = [
+    ...scope.matchAll(
+      /<a href="[^"]*cPath=([^"&]+)[^"]*" class="headerNavigation"[^>]*>([^<]*)<\/a>/g,
+    ),
+  ]
+    .map((match) => ({
+      depth: match[1].split("_").length,
+      label: decodeEntities(match[2]).trim(),
+    }))
+    .filter((level) => level.label);
+  if (levels.length === 0) return "";
+  // The type level is the first cPath with three or more segments; the
+  // breadcrumb reads shallow → deep, so the first hit precedes any style
+  // level below it.
+  return (
+    levels.find((level) => level.depth >= 3)?.label ??
+    levels[levels.length - 1].label
+  );
 }

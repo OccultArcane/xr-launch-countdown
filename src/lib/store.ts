@@ -38,7 +38,7 @@ export const SITE = {
   maskFontFile: "/unifrakturcook-bold.ttf",
   /**
    * Optional JSON feed for the "new products" section (array of { name,
-   * price, image, url, created }). Leave "" to use the built-in Convex
+   * price, image, url, created, category }). Leave "" to use the built-in Convex
    * feed that scrapes the creator's IMVU shop server-side
    * (src/convex/imvuFeed.ts) — the tiles keep the PRODUCTS catalog below
    * whenever nothing usable comes back.
