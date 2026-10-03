@@ -20,7 +20,8 @@ const EMPTY_TICKS = 8;
  * a time, terminal-style, with a blinking cursor — then deletes the
  * line and types it again in an endless loop. Styled to match the
  * header strip — same mono small caps, red accent and dividers — and
- * dismissible for the session (it reappears on reload).
+ * dismissible for the session (it reappears on reload with a fresh
+ * type-out).
  */
 export function NotificationSegment() {
   const [text, setText] = useState(FALLBACK_TEXT);

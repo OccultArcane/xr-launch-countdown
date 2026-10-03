@@ -48,7 +48,7 @@ export function SiteHeader() {
         </nav>
       </div>
 
-      {/* Pop-down notice — types itself out from under the header row */}
+      {/* Pop-down notice — types, deletes and retypes under the header row */}
       <NotificationSegment />
     </header>
   );
