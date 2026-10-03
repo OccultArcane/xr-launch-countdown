@@ -63,6 +63,9 @@ function trimUniformEdges(
 
   const columnUniform = (x: number, y0: number, y1: number) => {
     const start = (y0 * w + x) * 4;
+    // Only peel lines that match the outer background — otherwise solid
+    // shapes (a plain bar, a filled tile) would be trimmed away entirely.
+    if (!same(start, 0)) return false;
     for (let y = y0 + 1; y < y1; y += 2) {
       if (!same(start, (y * w + x) * 4)) return false;
     }
@@ -70,6 +73,7 @@ function trimUniformEdges(
   };
   const rowUniform = (y: number, x0: number, x1: number) => {
     const start = (y * w + x0) * 4;
+    if (!same(start, 0)) return false;
     for (let x = x0 + 1; x < x1; x += 2) {
       if (!same(start, (y * w + x) * 4)) return false;
     }
@@ -262,13 +266,13 @@ export function BinaryMark({
 
       // Artwork with real holes is masked by alpha; solid pieces (e.g. black
       // letters on a white tile) are masked by standing out from the paper.
+      // Judged across the whole file, because the trimmed region of a solid
+      // mark is solid by definition.
       let opaque = 0;
       let sampled = 0;
-      for (let y = rt; y < rt + rh; y += 4) {
-        for (let x = rl; x < rl + rw; x += 4) {
-          sampled += 1;
-          if (src[(y * sw + x) * 4 + 3] >= 128) opaque += 1;
-        }
+      for (let i = 3; i < src.length; i += 16) {
+        sampled += 1;
+        if (src[i] >= 128) opaque += 1;
       }
       const transparent = sampled === 0 || opaque / sampled < 0.95;
 
