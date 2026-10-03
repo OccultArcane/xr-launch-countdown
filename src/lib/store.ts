@@ -37,13 +37,13 @@ export const SITE = {
    */
   maskFontFile: "/unifrakturcook-bold.ttf",
   /**
-   * Live feed for the "new products" section: the 4 most recently created
-   * items fill the tiles automatically (expects an array of { name, price,
-   * image, url, created }). Replace the placeholder with your real IMVU
-   * creator endpoint — the section keeps the PRODUCTS catalog below while
-   * the endpoint is missing or unreachable.
+   * Optional JSON feed for the "new products" section (array of { name,
+   * price, image, url, created }). Leave "" to use the built-in Convex
+   * feed that scrapes the creator's IMVU shop server-side
+   * (src/convex/imvuFeed.ts) — the tiles keep the PRODUCTS catalog below
+   * whenever nothing usable comes back.
    */
-  productsApi: "https://api.example.com/imvu/creator/xr/products",
+  productsApi: "",
   /** Your IMVU store URL — used as the fallback link on a product page. */
   storeUrl: "https://www.imvu.com/store/",
 };

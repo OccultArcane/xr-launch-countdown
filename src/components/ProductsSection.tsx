@@ -1,6 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router";
+import { useAction } from "convex/react";
 import { motion } from "framer-motion";
+import { api } from "@/convex/_generated/api";
 import { fetchLatestProducts } from "@/lib/productsFeed";
 import { PRODUCTS, SITE, type Product } from "@/lib/store";
 
@@ -90,13 +92,17 @@ function Stack({ items, className }: { items: Product[]; className: string }) {
  */
 export function MarkWithProducts({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const runImvuFeed = useAction(api.imvuFeed.latest);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
-      // Non-empty only when the feed answered with usable rows; the tiles
-      // keep the built-in catalog otherwise.
-      const latest = await fetchLatestProducts(SITE.productsApi);
+      // A URL in SITE.productsApi is fetched directly; otherwise the
+      // Convex action scrapes the creator's IMVU shop server-side. Either
+      // way, empty results leave the built-in catalog in place.
+      const latest = SITE.productsApi
+        ? await fetchLatestProducts(SITE.productsApi)
+        : await runImvuFeed().catch(() => [] as Product[]);
       if (!cancelled && latest.length > 0) setProducts(latest);
     };
     void load();
@@ -104,7 +110,7 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [runImvuFeed]);
 
   const mid = Math.ceil(products.length / 2);
   const left = products.slice(0, mid);

@@ -58,10 +58,22 @@ const releasedTime = (value: string) => {
 };
 
 /**
- * Latest products from the live feed — newest first, at most 4 — mapped
- * onto the catalog tile shape. Returns [] when the endpoint is missing,
- * unreachable or answers with junk, so callers can keep the built-in
- * catalog instead of rendering an empty section.
+ * Maps raw feed rows onto catalog products — newest first, at most 4 —
+ * shared by the browser fetch path and the Convex IMVU feed action.
+ */
+export const normalizeFeedRows = (data: unknown): Product[] => {
+  if (!Array.isArray(data)) return [];
+  return (data as unknown[])
+    .map(toProduct)
+    .filter((item): item is Product => item !== null)
+    .sort((a, b) => releasedTime(b.released) - releasedTime(a.released))
+    .slice(0, 4);
+};
+
+/**
+ * Latest products from a JSON feed endpoint. Returns [] when the endpoint
+ * is missing, unreachable or answers with junk, so callers can keep the
+ * built-in catalog instead of rendering an empty section.
  */
 export async function fetchLatestProducts(
   endpoint: string,
@@ -70,14 +82,8 @@ export async function fetchLatestProducts(
   try {
     const response = await fetch(endpoint);
     if (!response.ok) return [];
-    const data = (await response.json()) as unknown;
-    if (!Array.isArray(data)) return [];
-    return (data as unknown[])
-      .map(toProduct)
-      .filter((item): item is Product => item !== null)
-      .sort((a, b) => releasedTime(b.released) - releasedTime(a.released))
-      .slice(0, 4);
+    return normalizeFeedRows((await response.json()) as unknown);
   } catch {
-    return []; // offline or placeholder endpoint
+    return []; // offline or unreachable endpoint
   }
 }
