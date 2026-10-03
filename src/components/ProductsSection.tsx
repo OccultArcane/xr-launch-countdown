@@ -7,7 +7,7 @@ import { fetchLatestProducts } from "@/lib/productsFeed";
 import { PRODUCTS, SITE, type Product } from "@/lib/store";
 
 const TILE_CLASS =
-  "glitch-hover group flex aspect-square w-[144px] flex-col border border-white/10 bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]";
+  "glitch-hover group flex w-[144px] flex-col border border-white/10 bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]";
 
 function Tile({ product }: { product: Product }) {
   const body = (
@@ -23,17 +23,17 @@ function Tile({ product }: { product: Product }) {
         <span className="truncate text-neutral-500">{product.category}</span>
       </div>
 
-      {/* Image slot — the thumbnail fills the whole slot, cropping to fit */}
-      <div className="mt-3 min-h-0 flex-1 overflow-hidden">
-        {product.image && (
+      {/* Image — full tile width at its natural height, never cropped */}
+      {product.image && (
+        <div className="mt-3">
           <img
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="h-full w-full object-cover"
+            className="block h-auto w-full"
           />
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="mt-auto min-w-0">
         <h3 className="text-[11px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white sm:text-[12px]">
