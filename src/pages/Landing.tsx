@@ -6,10 +6,13 @@ import { MarkWithProducts } from "@/components/ProductsSection";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { SITE } from "@/lib/store";
 
+/**
+ * Support channels — full URLs. Add Discord here once its server invite
+ * exists; the "/" separator renders automatically between entries.
+ */
 const SUPPORT_SOCIALS = [
-  { name: "Pinterest", domain: "pinterest.com" },
-  { name: "Instagram", domain: "instagram.com" },
-  { name: "Discord", domain: "discord.com" },
+  { name: "Pinterest", href: "https://uk.pinterest.com/MI5vu/" },
+  { name: "Instagram", href: "https://www.instagram.com/xr.imvu/" },
 ];
 
 export default function Landing() {
@@ -56,14 +59,14 @@ export default function Landing() {
             className="flex flex-wrap items-center justify-center gap-x-3 text-[13px] tracking-[0.12em]"
           >
             {SUPPORT_SOCIALS.map((social, index) => (
-              <Fragment key={social.domain}>
+              <Fragment key={social.href}>
                 {index > 0 && (
                   <span aria-hidden="true" className="text-neutral-600">
                     /
                   </span>
                 )}
                 <a
-                  href={`https://${social.domain}`}
+                  href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="glitch-hover no-underline text-neutral-300 transition-colors hover:text-white"

@@ -1,9 +1,19 @@
 import { Fragment } from "react";
 
+/** Supported creators, each linked to their IMVU shop by manufacturers id. */
 const HEADER_LINKS = [
-  { label: "chokinglotus", href: "#" },
-  { label: "Numen", href: "#" },
-  { label: "G59", href: "#" },
+  {
+    label: "chokinglotus",
+    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=272737258",
+  },
+  {
+    label: "Numen",
+    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=179356122",
+  },
+  {
+    label: "G59",
+    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=119374898",
+  },
 ];
 
 export function SiteHeader() {
