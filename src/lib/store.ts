@@ -12,8 +12,8 @@
 export const SITE = {
   /** Brand shown in the header and footer. */
   name: "xr",
-  /** What the binary mark spells. */
-  maskText: "xr",
+  /** What the binary mark spells — the centred XR monogram. */
+  maskText: "XR",
   /**
    * Logo used as the mask for the binary mark when no font mask loads.
    * Save your artwork into /public (e.g. "xr-mask.png" — transparent PNG

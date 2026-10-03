@@ -5,15 +5,29 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
+/** One vertical stream of digits — a column's bits scrolling downward. */
+type Column = {
+  bits: string[];
+  /** Rows the stream falls per second. */
+  speed: number;
+  phase: number;
+};
+
 type Cell = {
   x: number;
   y: number;
-  ch: string;
+  /** The stream this cell samples its digit from. */
+  col: Column;
+  /** Row index within that stream. */
+  row: number;
+  /** Glitch scramble: invert the streamed digit. */
+  flip: boolean;
   alpha: number;
+  /** Bloom is fixed per cell so the glow never flickers. */
+  glow: boolean;
   phase: number;
   amp: number;
   speed: number;
-  flipAt: number;
   redAt: number;
   redDur: number;
 };
@@ -29,16 +43,11 @@ type Mask = {
 const FONT_FAMILY =
   'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
 
-const ALPHA_STEPS = 24;
-const STYLES: string[] = Array.from(
-  { length: ALPHA_STEPS + 1 },
-  (_, i) => `rgba(240,240,240,${(i / ALPHA_STEPS).toFixed(3)})`,
-);
-
-function styleFor(alpha: number) {
-  const step = Math.round(alpha * ALPHA_STEPS);
-  return STYLES[Math.max(0, Math.min(ALPHA_STEPS, step))];
-}
+/** Silver ink for the digits — crisp white core with a cool bloom. */
+const SILVER = "#f2f5fa";
+/** Accent sparks and the glitch chromatic ghosts. */
+const SPARK_RED = "#f84848";
+const GHOST_CYAN = "#48dcf8";
 
 type Edges = { l: number; t: number; r: number; b: number };
 
@@ -153,12 +162,12 @@ const loadMaskFont = async (url: string): Promise<string | null> => {
 };
 
 /**
- * The mark drawn as a grid of 0s and 1s confined strictly to the logo
- * silhouette: digits flicker, flip and occasionally flash red, all kept
- * inside the masked shape.
+ * The XR monogram built from tiny digits: Matrix-style streams fall
+ * downward through the blackletter silhouette — dense inside, sparse
+ * outside — punctuated by rare red sparks and glitch bursts.
  */
 export function BinaryMark({
-  text = "xr",
+  text = "XR",
   fontSrc,
   imageSrc,
   fallbackImageSrc,
@@ -187,6 +196,8 @@ export function BinaryMark({
     let resizeTimer: number | undefined;
     let glitchUntil = 0;
     let nextGlitch = 0;
+    let gridRows = 1;
+    const sprites = new Map<string, HTMLCanvasElement>();
     const TORN_BAND = 26;
     const tornBands = new Map<number, number>();
 
@@ -195,6 +206,36 @@ export function BinaryMark({
       off.width = w;
       off.height = h;
       return off;
+    };
+
+    /**
+     * Digits are pre-rendered once — optionally with a baked silver glow —
+     * and blitted per frame, so thousands of them stay cheap to draw.
+     */
+    const digitSprite = (ch: string, color: string, glow: boolean) => {
+      const key = `${ch}|${color}|${glow ? 1 : 0}`;
+      const hit = sprites.get(key);
+      if (hit) return hit;
+
+      const fs = Math.round(cell * 1.15);
+      const pad = glow ? Math.max(2, Math.round(cell * 0.9)) : 1;
+      const size = fs + pad * 2;
+      const spr = newCanvas(size, size);
+      const sctx = spr.getContext("2d");
+      if (sctx) {
+        sctx.font = `500 ${fs}px ${FONT_FAMILY}`;
+        sctx.textAlign = "center";
+        sctx.textBaseline = "middle";
+        sctx.fillStyle = color;
+        if (glow) {
+          sctx.shadowColor = color;
+          sctx.shadowBlur = cell * 0.9;
+        }
+        sctx.fillText(ch, size / 2, size / 2);
+        if (glow) sctx.fillText(ch, size / 2, size / 2); // lift the core
+      }
+      sprites.set(key, spr);
+      return spr;
     };
 
     const rasterizeText = (family: string = FONT_FAMILY): Mask => {
@@ -359,7 +400,9 @@ export function BinaryMark({
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      cell = width < 560 ? 12 : width < 900 ? 14 : 15;
+      // Tiny digits on a tight grid: thousands of them build the monogram.
+      cell = width < 560 ? 6 : width < 900 ? 7 : 8;
+      sprites.clear();
 
       // Font mask wins: the wordmark set in the configured display font
       // (Deutsch Gothic) is the silhouette whenever its file is present.
@@ -413,34 +456,67 @@ export function BinaryMark({
         return total / probes.length;
       };
 
+      gridRows = Math.max(1, Math.ceil(height / cell));
+
+      // One digit stream per column: bits fall downward and repeatedly carry
+      // the ASCII bytes for X (01011000) and R (01010010) through the shape.
+      const makeColumn = (): Column => {
+        const bits: string[] = Array.from({ length: gridRows }, () =>
+          Math.random() < 0.5 ? "0" : "1",
+        );
+        let pos = Math.floor(Math.random() * 8);
+        while (pos + 8 <= gridRows) {
+          const byte = Math.random() < 0.5 ? "01011000" : "01010010";
+          for (let k = 0; k < 8; k++) bits[pos + k] = byte[k];
+          pos += 10 + Math.floor(Math.random() * 14);
+        }
+        return {
+          bits,
+          speed: 4 + Math.random() * 7,
+          phase: Math.random() * 32,
+        };
+      };
+
       const next: Cell[] = [];
+      const columns = new Map<number, Column>();
       const now = performance.now();
 
-      for (let gy = cell / 2; gy < height; gy += cell) {
+      for (let gy = cell / 2, row = 0; gy < height; gy += cell, row++) {
         for (let gx = cell / 2; gx < width; gx += cell) {
           const cov = coverage(gx, gy);
 
           let alpha = 0;
           if (cov >= 0.55) {
-            alpha = 0.55 + Math.random() * 0.45;
+            alpha = 0.6 + Math.random() * 0.4;
           } else if (cov >= 0.28) {
             // Edge cells are kept so the digits hug the outline closely.
             alpha = 0.3 + Math.random() * 0.3;
+          } else if (Math.random() < 0.055) {
+            // Sparse field outside the letters — kept very dim so the
+            // monogram stays the clear, high-contrast subject.
+            alpha = 0.05 + Math.random() * 0.12;
           }
-          // Nothing outside the mark — the shape stays fully masked.
           if (alpha <= 0) continue;
+
+          let col = columns.get(gx);
+          if (!col) {
+            col = makeColumn();
+            columns.set(gx, col);
+          }
 
           next.push({
             x: gx,
             y: gy,
-            ch: Math.random() < 0.5 ? "0" : "1",
+            col,
+            row,
+            flip: false,
             alpha,
+            glow: alpha >= 0.8,
             phase: Math.random() * Math.PI * 2,
-            amp: 0.3 + Math.random() * 0.7,
+            amp: 0.2 + Math.random() * 0.5,
             speed: 0.35 + Math.random() * 1.1,
-            flipAt: reduceMotion ? 0 : now + 500 + Math.random() * 4000,
-            redAt: reduceMotion ? 0 : now + Math.random() * 25000,
-            redDur: 400 + Math.random() * 500,
+            redAt: reduceMotion ? 0 : now + 30000 + Math.random() * 180000,
+            redDur: 350 + Math.random() * 350,
           });
         }
       }
@@ -453,9 +529,20 @@ export function BinaryMark({
     const draw = (nowMs: number) => {
       const t = nowMs / 1000;
       ctx.clearRect(0, 0, width, height);
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.font = `500 ${Math.round(cell * 1.15)}px ${FONT_FAMILY}`;
+
+      /** Blit a pre-rendered digit — far cheaper than filling text per frame. */
+      const ink = (
+        ch: string,
+        x: number,
+        y: number,
+        alpha: number,
+        glow: boolean,
+        color: string = SILVER,
+      ) => {
+        const spr = digitSprite(ch, color, glow);
+        ctx.globalAlpha = Math.min(1, alpha);
+        ctx.drawImage(spr, x - spr.width / 2, y - spr.height / 2);
+      };
 
       // Periodic glitch burst: torn bands, chromatic split, scrambled digits.
       let glitching = false;
@@ -478,10 +565,11 @@ export function BinaryMark({
       }
 
       for (const c of cells) {
-        if (c.flipAt !== 0 && nowMs > c.flipAt) {
-          c.ch = c.ch === "0" ? "1" : "0";
-          c.flipAt = nowMs + 700 + Math.random() * 4200;
-        }
+        // Sample this cell's digit from its column's falling stream.
+        const off = Math.floor(t * c.col.speed + c.col.phase);
+        const idx = (((c.row - off) % gridRows) + gridRows) % gridRows;
+        let ch = c.col.bits[idx];
+        if (c.flip) ch = ch === "0" ? "1" : "0";
 
         let x = c.x;
         let y = c.y;
@@ -496,17 +584,15 @@ export function BinaryMark({
         if (glitching) {
           const tear = tornBands.get(Math.floor(y / TORN_BAND));
           if (tear) x += tear;
-          if (Math.random() < 0.06) {
-            c.ch = c.ch === "0" ? "1" : "0";
-            c.flipAt = nowMs + 400 + Math.random() * 900;
-          }
+          if (Math.random() < 0.06) c.flip = !c.flip;
         }
 
-        // Every so often a single digit flashes red, then fades back.
+        // Rare red spark — the accent only flickers through a few digits,
+        // so the monogram reads white-and-silver at a glance.
         let red = false;
         if (c.redAt !== 0) {
           if (nowMs >= c.redAt + c.redDur) {
-            c.redAt = nowMs + 15000 + Math.random() * 35000;
+            c.redAt = nowMs + 90000 + Math.random() * 180000;
           } else {
             red = nowMs >= c.redAt;
           }
@@ -516,21 +602,19 @@ export function BinaryMark({
 
         if (glitching) {
           // Chromatic split: red and cyan ghosts either side of the digit.
-          const ghost = Math.min(1, alpha * 0.85).toFixed(3);
-          ctx.fillStyle = `rgba(248,72,72,${ghost})`;
-          ctx.fillText(c.ch, x - 2.5, y);
-          ctx.fillStyle = `rgba(72,220,248,${ghost})`;
-          ctx.fillText(c.ch, x + 2.5, y);
+          const ghost = Math.min(1, alpha * 0.85);
+          ink(ch, x - 2.5, y, ghost, false, SPARK_RED);
+          ink(ch, x + 2.5, y, ghost, false, GHOST_CYAN);
           if (Math.random() < 0.06) continue; // core dropouts mid-burst
         }
 
         if (red) {
-          ctx.fillStyle = `rgba(248,72,72,${Math.min(1, alpha * 1.3).toFixed(3)})`;
+          ink(ch, x, y, Math.min(1, alpha * 1.3), true, SPARK_RED);
         } else {
-          ctx.fillStyle = styleFor(alpha);
+          ink(ch, x, y, alpha, c.glow);
         }
-        ctx.fillText(c.ch, x, y);
       }
+      ctx.globalAlpha = 1;
     };
 
     const loop = (now: number) => {
