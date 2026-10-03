@@ -5,13 +5,20 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 const DOC_URL = "/notification.txt";
 /** Used only when the document can't be read — keep in sync with it. */
 const FALLBACK_TEXT = "Discord server is in devolpment";
-/** Milliseconds per character in the typewriter reveal. */
+/** Milliseconds per tick of the typewriter — one character typed per tick. */
 const TYPE_MS = 55;
+/** Pause (~2s) on the finished line before it starts deleting. */
+const HOLD_TICKS = 36;
+/** Characters erased per tick — deleting runs about twice as fast. */
+const ERASE_STEP = 2;
+/** Pause (~0.4s) on the empty line before retyping. */
+const EMPTY_TICKS = 8;
 
 /**
  * The header's pop-down notice: reads its message from a plain text
  * document (public/notification.txt) and types it out one character at
- * a time, terminal-style, with a blinking cursor. Styled to match the
+ * a time, terminal-style, with a blinking cursor — then deletes the
+ * line and types it again in an endless loop. Styled to match the
  * header strip — same mono small caps, red accent and dividers — and
  * dismissible for the session (it reappears on reload).
  */
@@ -39,16 +46,36 @@ export function NotificationSegment() {
     };
   }, []);
 
-  // Typewriter reveal: one character every TYPE_MS. Reduced-motion
-  // readers skip the animation — the line below shows the full text
-  // directly instead of the animated state.
+  // Typewriter loop: type the line out, hold, delete it, then retype —
+  // forever. Reduced-motion readers skip the animation; the line below
+  // shows the full text directly instead of the animated state.
   useEffect(() => {
     if (!text || reduceMotion) return;
-    let i = 0;
+    let len = 0;
+    let phase: "typing" | "holding" | "erasing" | "waiting" = "typing";
+    let wait = 0;
     const id = window.setInterval(() => {
-      i += 1;
-      setTyped(text.slice(0, i));
-      if (i >= text.length) window.clearInterval(id);
+      if (phase === "typing") {
+        len += 1;
+        setTyped(text.slice(0, len));
+        if (len >= text.length) {
+          phase = "holding";
+          wait = HOLD_TICKS;
+        }
+      } else if (phase === "holding") {
+        wait -= 1;
+        if (wait <= 0) phase = "erasing";
+      } else if (phase === "erasing") {
+        len = Math.max(0, len - ERASE_STEP);
+        setTyped(text.slice(0, len));
+        if (len <= 0) {
+          phase = "waiting";
+          wait = EMPTY_TICKS;
+        }
+      } else {
+        wait -= 1;
+        if (wait <= 0) phase = "typing";
+      }
     }, TYPE_MS);
     return () => window.clearInterval(id);
   }, [text, reduceMotion]);
