@@ -3,6 +3,7 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from "react";
 
 /** One vertical stream of glyphs — a column's x's and r's scrolling down. */
@@ -149,6 +150,12 @@ type BinaryMarkProps = {
   imageSrc?: string;
   /** Tried when the font and `imageSrc` are missing or fail to load. */
   fallbackImageSrc?: string;
+  /**
+   * Optional line (e.g. the slogan) anchored just under the wordmark
+   * inside the stage — it rides the same 3D parallax tilt as the mark,
+   * while the digits stay canvas-only.
+   */
+  caption?: ReactNode;
 };
 
 let maskFontFace: FontFace | null = null;
@@ -189,6 +196,7 @@ export function BinaryMark({
   fontSrc,
   imageSrc,
   fallbackImageSrc,
+  caption,
 }: BinaryMarkProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -675,19 +683,26 @@ export function BinaryMark({
 
   return (
     <div
-      ref={wrapRef}
       className="relative h-full w-full"
-      aria-hidden="true"
       onPointerMove={handleMove}
       onPointerLeave={() => setTilt({ x: 0, y: 0 })}
     >
       <div
-        className="h-full w-full transition-transform duration-200 ease-out will-change-transform"
+        className="relative flex h-full w-full flex-col transition-transform duration-200 ease-out will-change-transform"
         style={{
           transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         }}
       >
-        <canvas ref={canvasRef} className="block h-full w-full" />
+        {/* The stage the canvas measures — sized exactly as before, so
+            the caption overlays the mark instead of pushing it. */}
+        <div ref={wrapRef} className="min-h-0 w-full flex-1" aria-hidden="true">
+          <canvas ref={canvasRef} className="block h-full w-full" />
+        </div>
+        {caption && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-[16%]">
+            {caption}
+          </div>
+        )}
       </div>
     </div>
   );
