@@ -2,7 +2,7 @@ import { Fragment } from "react";
 
 const HEADER_LINKS = [
   { label: "chokinglotus", href: "#" },
-  { label: "numen", href: "#" },
+  { label: "Numen", href: "#" },
   { label: "G59", href: "#" },
 ];
 
@@ -10,8 +10,8 @@ export function SiteHeader() {
   return (
     <header className="border-b border-white/10">
       <div className="mx-auto flex min-h-14 w-full max-w-5xl items-center justify-between gap-4 px-6">
-        <span className="whitespace-nowrap text-[10px] lowercase tracking-[0.06em] text-neutral-200 sm:text-sm sm:tracking-[0.35em]">
-          supported creators
+        <span className="whitespace-nowrap text-[10px] tracking-[0.06em] text-neutral-200 sm:text-sm sm:tracking-[0.35em]">
+          Supported Creators
         </span>
         <nav
           aria-label="links"
