@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { NotificationSegment } from "./NotificationSegment";
 
 /** Supported creators, each linked to their IMVU shop by manufacturers id. */
 const HEADER_LINKS = [
@@ -46,6 +47,9 @@ export function SiteHeader() {
           ))}
         </nav>
       </div>
+
+      {/* Pop-down notice — types itself out from under the header row */}
+      <NotificationSegment />
     </header>
   );
 }
