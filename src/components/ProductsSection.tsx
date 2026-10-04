@@ -7,12 +7,12 @@ import { fetchLatestProducts } from "@/lib/productsFeed";
 import { PRODUCTS, SITE, type Product } from "@/lib/store";
 
 const TILE_CLASS =
-  "glitch-hover group flex w-[144px] flex-col border border-white/10 bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] sm:p-4 xl:w-[156px]";
+  "glitch-hover group flex w-[144px] flex-col border border-white/10 bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] @sm:p-4 @xl:w-[156px]";
 
 function Tile({ product }: { product: Product }) {
   const body = (
     <>
-      <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] sm:text-[9px]">
+      <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] @sm:text-[9px]">
         <span className="flex items-center gap-1.5 text-neutral-300">
           <span
             className="blink-dot h-1.5 w-1.5 rounded-full bg-xr-red"
@@ -36,7 +36,7 @@ function Tile({ product }: { product: Product }) {
       )}
 
       <div className="mt-auto min-w-0">
-        <h3 className="text-[11px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white sm:text-[12px]">
+        <h3 className="text-[11px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white @sm:text-[12px]">
           {product.name}
         </h3>
       </div>
@@ -86,7 +86,9 @@ function Stack({ items, className }: { items: Product[]; className: string }) {
 
 /**
  * The catalog beside the mark: square tiles stacked on top of each other —
- * a column on each side on desktop, one full stack under it on mobile.
+ * a column on each side of the mark, or one full stack under it when the
+ * container is too narrow for the row (breakpoints query the fixed-size
+ * stage container, so every device shows the same arrangement).
  * The tiles fill from the live feed (latest 4 by creation date) and keep
  * the built-in catalog whenever the feed is unavailable.
  */
@@ -133,18 +135,18 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
       transition={{ duration: 0.7, ease: "easeOut" }}
       className="w-full scroll-m-24"
     >
-      <div className="flex w-full flex-col items-center gap-8 lg:flex-row lg:items-center lg:gap-6">
+      <div className="flex w-full flex-col items-center gap-8 @lg:flex-row @lg:items-center @lg:gap-6">
         {hasProducts && (
-          <Stack items={left} className="order-1 hidden lg:grid" />
+          <Stack items={left} className="order-1 hidden @lg:grid" />
         )}
 
         {/* The mark: x's and r's assembling your logo silhouette */}
-        <div className="order-1 h-[clamp(240px,42vh,440px)] w-full lg:order-2 lg:w-auto lg:flex-1">
+        <div className="order-1 h-[440px] w-full @lg:order-2 @lg:w-auto @lg:flex-1">
           {children}
         </div>
 
         {hasProducts && (
-          <div className="order-2 grid w-fit grid-cols-1 gap-2.5 lg:hidden">
+          <div className="order-2 grid w-fit grid-cols-1 gap-2.5 @lg:hidden">
             {products.map((product) => (
               <Tile key={product.id} product={product} />
             ))}
@@ -152,7 +154,7 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
         )}
 
         {hasProducts && (
-          <Stack items={right} className="order-3 hidden lg:grid" />
+          <Stack items={right} className="order-3 hidden @lg:grid" />
         )}
       </div>
     </motion.section>

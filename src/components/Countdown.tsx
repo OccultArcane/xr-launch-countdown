@@ -65,14 +65,14 @@ export function Countdown() {
           <div
             key={label}
             className={
-              "px-2 py-6 text-center sm:py-7 " +
+              "px-2 py-6 text-center @sm:py-7 " +
               (index > 0 ? "border-l border-white/10" : "")
             }
           >
-            <div className="text-3xl leading-none tabular-nums text-neutral-100 sm:text-5xl">
+            <div className="text-3xl leading-none tabular-nums text-neutral-100 @sm:text-5xl">
               {pad(value)}
             </div>
-            <div className="mt-3 text-[8px] uppercase tracking-[0.2em] text-neutral-500 sm:text-[9px] sm:tracking-[0.3em]">
+            <div className="mt-3 text-[8px] uppercase tracking-[0.2em] text-neutral-500 @sm:text-[9px] @sm:tracking-[0.3em]">
               {label}
             </div>
           </div>

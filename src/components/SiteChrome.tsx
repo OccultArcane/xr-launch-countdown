@@ -21,12 +21,12 @@ export function SiteHeader() {
   return (
     <header className="border-b border-white/10">
       <div className="mx-auto flex min-h-14 w-full max-w-5xl items-center justify-between gap-4 px-6">
-        <span className="whitespace-nowrap text-[10px] tracking-[0.06em] text-neutral-200 sm:text-sm sm:tracking-[0.35em]">
+        <span className="whitespace-nowrap text-[10px] tracking-[0.06em] text-neutral-200 @sm:text-sm @sm:tracking-[0.35em]">
           Supported Creators
         </span>
         <nav
           aria-label="links"
-          className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] sm:text-[11px] sm:tracking-[0.18em]"
+          className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] @sm:text-[11px] @sm:tracking-[0.18em]"
         >
           {HEADER_LINKS.map((link, index) => (
             <Fragment key={link.label}>
@@ -58,10 +58,10 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-white/10">
       <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-2.5 px-6 py-7 text-center">
-        <p className="text-[9px] tracking-[0.18em] text-xr-red sm:text-[11px] sm:tracking-[0.28em]">
+        <p className="text-[9px] tracking-[0.18em] text-xr-red @sm:text-[11px] @sm:tracking-[0.28em]">
           ALL THEFT WILL RESULT IN DMCA CONSEQUENCES
         </p>
-        <p className="text-[9px] tracking-[0.24em] text-neutral-500 sm:text-[10px] sm:tracking-[0.3em]">
+        <p className="text-[9px] tracking-[0.24em] text-neutral-500 @sm:text-[10px] @sm:tracking-[0.3em]">
           © 2026 ALL RIGHTS RESERVED
         </p>
       </div>

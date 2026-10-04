@@ -463,16 +463,28 @@ export function BinaryMark({
 
     const build = async () => {
       const id = ++buildId;
-      const rect = wrap.getBoundingClientRect();
-      width = Math.max(1, Math.round(rect.width));
-      height = Math.max(1, Math.round(rect.height));
+      // Measure in layout pixels: the stage's fit-to-screen transform must
+      // not change the mark's design size (getBoundingClientRect would
+      // report the scaled box). The visual scale — layout size → on-screen
+      // size — only raises the backing store's resolution so the canvas
+      // stays crisp when the stage is enlarged on big displays.
+      const layoutW = wrap.clientWidth;
+      const layoutH = wrap.clientHeight;
+      width = Math.max(1, Math.round(layoutW));
+      height = Math.max(1, Math.round(layoutH));
+      const visual =
+        layoutW > 0 ? wrap.getBoundingClientRect().width / layoutW : 1;
 
       const dpr = Math.min(2, window.devicePixelRatio || 1);
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
+      const quality = Math.max(
+        1,
+        Math.min(4, dpr * Math.min(4, Math.max(0.25, visual))),
+      );
+      canvas.width = Math.round(width * quality);
+      canvas.height = Math.round(height * quality);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.setTransform(quality, 0, 0, quality, 0, 0);
 
       // Tiny glyphs on a tight grid: thousands of them build the monogram.
       cell = width < 560 ? 6 : width < 900 ? 7 : 8;
