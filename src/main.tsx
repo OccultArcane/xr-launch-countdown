@@ -3,9 +3,16 @@ import { RequireAuth } from "@/components/RequireAuth";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
+import { convexUrl, hasConvex } from "@/lib/convex";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router";
+import {
+  BrowserRouter,
+  Link,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router";
 import "./index.css";
 
 // Lazy load route components for better code splitting
@@ -80,7 +87,51 @@ class RootErrorBoundary extends React.Component<
   }
 }
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+/**
+ * The client is only built when the deployment URL is present — Convex
+ * throws on an empty address at import time, which would blank the whole
+ * page instead of rendering the storefront.
+ */
+const convex = hasConvex ? new ConvexReactClient(convexUrl) : null;
+
+/**
+ * Vite's base without its trailing slash, so the router matches routes under
+ * whatever sub-path the build is hosted at ("" at a domain root, "/<repo>"
+ * on GitHub Pages).
+ */
+const basename = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+/**
+ * Sign-in and the dashboard are the only screens that need the backend.
+ * With no deployment configured there is nothing to sign in to, so they
+ * say so rather than crashing inside an auth hook.
+ */
+function BackendNotice() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-6 font-mono text-neutral-300">
+      <div className="max-w-sm border border-white/10 px-6 py-8 text-center">
+        <p className="text-[10px] uppercase tracking-[0.35em] text-xr-red">
+          backend offline
+        </p>
+        <p className="mt-5 text-[13px] leading-relaxed text-neutral-400">
+          Accounts need a Convex deployment. Set <code>VITE_CONVEX_URL</code>{" "}
+          (run <code>npx convex dev</code>) and this screen becomes the sign-in
+          flow.
+        </p>
+        <Link
+          to="/"
+          className="glitch-hover mt-8 inline-block border border-white/20 px-5 py-3 text-[11px] uppercase tracking-[0.3em] text-neutral-100 transition-colors hover:border-white hover:bg-white hover:text-[#0a0a0a]"
+        >
+          ← back to the store
+        </Link>
+      </div>
+    </main>
+  );
+}
+
+/** Renders the screen only when there is a deployment behind it. */
+const withBackend = (screen: React.ReactNode) =>
+  hasConvex ? screen : <BackendNotice />;
 
 function RouteSyncer() {
   const location = useLocation();
@@ -105,37 +156,45 @@ function RouteSyncer() {
   return null;
 }
 
+const app = (
+  <>
+    <BrowserRouter basename={basename || undefined}>
+      <RouteSyncer />
+      <Suspense fallback={<RouteLoading />}>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route
+            path="/auth"
+            element={withBackend(<AuthPage redirectAfterAuth="/dashboard" />)}
+          />
+          <Route
+            path="/dashboard"
+            element={withBackend(
+              <RequireAuth>
+                <Dashboard />
+              </RequireAuth>,
+            )}
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+    <Toaster />
+  </>
+);
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RootErrorBoundary>
       <ToolbarErrorBoundary>
         <VlyToolbar />
       </ToolbarErrorBoundary>
-      <ConvexAuthProvider client={convex}>
-        <BrowserRouter>
-          <RouteSyncer />
-          <Suspense fallback={<RouteLoading />}>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/products/:id" element={<ProductDetail />} />
-              <Route
-                path="/auth"
-                element={<AuthPage redirectAfterAuth="/dashboard" />}
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <RequireAuth>
-                    <Dashboard />
-                  </RequireAuth>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-        <Toaster />
-      </ConvexAuthProvider>
+      {convex ? (
+        <ConvexAuthProvider client={convex}>{app}</ConvexAuthProvider>
+      ) : (
+        app
+      )}
     </RootErrorBoundary>
   </StrictMode>,
 );

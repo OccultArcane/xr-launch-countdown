@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { asset } from "@/lib/asset";
 
 /** Where the notice lives — edited without touching any code. */
-const DOC_URL = "/notification.txt";
+const DOC_URL = asset("notification.txt");
 /** Used only when the document can't be read — keep in sync with it. */
 const FALLBACK_TEXT = "Discord server is in devolpment";
 /** Milliseconds per tick of the typewriter — one character typed per tick. */

@@ -1,4 +1,7 @@
 .env.local
 node_modules
 dist
-src/convex/_generated
+# Convex generates src/convex/_generated on `npx convex dev`, but the app
+# imports it directly and it is needed to typecheck or build, so it is
+# tracked: a plain checkout builds without a deployment wired up.
+.convex

@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { NotificationSegment } from "./NotificationSegment";
 
 /** Supported creators, each linked to their IMVU shop by manufacturers id. */
@@ -28,13 +27,16 @@ export function SiteHeader() {
           aria-label="links"
           className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] @sm:text-[11px] @sm:tracking-[0.18em]"
         >
-          {HEADER_LINKS.map((link, index) => (
-            <Fragment key={link.label}>
-              {index > 0 && (
-                <span aria-hidden="true" className="text-neutral-600">
-                  /
-                </span>
-              )}
+          {/* Each creator sits inside its own brackets — [name] — so the
+              row reads as a list of links without a separator between. */}
+          {HEADER_LINKS.map((link) => (
+            <span
+              key={link.label}
+              className="inline-flex items-center whitespace-nowrap"
+            >
+              <span aria-hidden="true" className="text-neutral-600">
+                [
+              </span>
               <a
                 href={link.href}
                 target="_blank"
@@ -43,7 +45,10 @@ export function SiteHeader() {
               >
                 {link.label}
               </a>
-            </Fragment>
+              <span aria-hidden="true" className="text-neutral-600">
+                ]
+              </span>
+            </span>
           ))}
         </nav>
       </div>

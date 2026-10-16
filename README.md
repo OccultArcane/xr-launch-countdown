@@ -17,6 +17,40 @@ All relevant files live in the 'src' directory.
 
 Use bun for the package manager.
 
+## The storefront: products, images and hosting
+
+The landing page's four tiles are driven by `public/products.json` — a snapshot of the
+creator's live IMVU shop that `npm run refresh-products` writes (the newest four items: id,
+name, credit price, breadcrumb category, thumbnail URL and the link into the shop). Re-run it
+when a drop lands and commit the file: the tiles, their artwork and their links then follow
+the shop with nothing running server-side. Thumbnails are hotlinked from IMVU's CDN — the
+same host the live feed returns — so no artwork is copied into the repository.
+
+The tiles fall through three layers, in this order:
+
+1. `public/products.json`, refreshed by hand. This is the feed on any static host.
+2. `PRODUCTS` in `src/lib/store.ts` — the same four items baked in, used when that JSON
+   cannot be fetched at all. It is also what the `/products/<id>` detail pages are built
+   from, and what titles/prices/links the tiles show with no network at all.
+3. The Convex action in `src/convex/imvuFeed.ts` — live server-side scraping. It is only
+   reached when `SITE.productsApi` is set to `""`; that needs a deployment (`npx convex dev`)
+   and its `VITE_CONVEX_URL`.
+
+### Publishing it
+
+* `npm run build` — normal root-relative build for any host, including the Freebuff preview.
+* `npm run build:pages` — builds for GitHub Pages at `/<repo>/` and writes `dist/404.html`,
+  so deep links such as `/<repo>/products/76161696` boot the app instead of 404ing.
+* `.github/workflows/deploy-pages.yml` — runs both on every push to `main` and deploys.
+  Enable it once under Settings → Pages → Build and deployment → Source: GitHub Actions.
+
+Every public asset and internal link resolves through `src/lib/asset.ts`
+(`import.meta.env.BASE_URL`), so the storefront works at a domain root or under a sub-path
+unchanged — that also covers the font the binary mark is drawn in and the notice strip.
+
+No backend is needed to publish: with no `VITE_CONVEX_URL` the storefront renders in full and
+`/auth` and `/dashboard` show a "backend offline" note instead of a blank page.
+
 ## Setup
 
 This project is set up already and running on a cloud environment, as well as a convex development in the sandbox.

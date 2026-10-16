@@ -32,12 +32,12 @@ export default function ProductDetail() {
                 This item is not in the current catalog. It may have been
                 renamed or removed.
               </p>
-              <a
-                href="/#products"
+              <Link
+                to="/#products"
                 className="glitch-hover mt-9 inline-block border border-white/20 px-6 py-3.5 text-[11px] uppercase tracking-[0.3em] text-neutral-100 transition-colors hover:border-white hover:bg-white hover:text-[#0a0a0a]"
               >
                 ← all products
-              </a>
+              </Link>
             </div>
           ) : (
             <>
@@ -45,12 +45,12 @@ export default function ProductDetail() {
                 aria-label="breadcrumb"
                 className="text-[10px] uppercase tracking-[0.3em] text-neutral-500"
               >
-                <a
-                  href="/#products"
+                <Link
+                  to="/#products"
                   className="transition-colors hover:text-neutral-200"
                 >
                   products
-                </a>
+                </Link>
                 <span className="mx-2 text-neutral-700">/</span>
                 <span className="text-neutral-300">{product.sku}</span>
               </nav>
@@ -110,12 +110,12 @@ export default function ProductDetail() {
                 >
                   open in the imvu store ↗
                 </a>
-                <a
-                  href="/#products"
+                <Link
+                  to="/#products"
                   className="glitch-hover text-[11px] uppercase tracking-[0.3em] text-neutral-500 transition-colors hover:text-neutral-200"
                 >
                   ← all products
-                </a>
+                </Link>
               </div>
 
               {others.length > 0 && (

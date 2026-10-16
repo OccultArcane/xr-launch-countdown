@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { BinaryMark } from "@/components/BinaryMark";
 import { Countdown } from "@/components/Countdown";
@@ -8,9 +8,10 @@ import { Stage } from "@/components/Stage";
 import { SITE } from "@/lib/store";
 
 /**
- * Support channels — full URLs; the "/" separator renders between
- * entries. An empty href renders the name dimmed as inactive (Discord:
- * drop its invite in when the server exists and it goes live).
+ * Support channels — full URLs, each rendered inside its own brackets
+ * ([name]) so the row needs no separator between entries. An empty href
+ * renders the name dimmed as inactive (Discord: drop its invite in when
+ * the server exists and it goes live).
  */
 const SUPPORT_SOCIALS = [
   { name: "Pinterest", href: "https://www.pinterest.com/xrimvu" },
@@ -73,13 +74,14 @@ export default function Landing() {
               transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
               className="flex flex-wrap items-center justify-center gap-x-3 text-[13px] tracking-[0.12em]"
             >
-              {SUPPORT_SOCIALS.map((social, index) => (
-                <Fragment key={social.name}>
-                  {index > 0 && (
-                    <span aria-hidden="true" className="text-neutral-600">
-                      /
-                    </span>
-                  )}
+              {SUPPORT_SOCIALS.map((social) => (
+                <span
+                  key={social.name}
+                  className="inline-flex items-center whitespace-nowrap"
+                >
+                  <span aria-hidden="true" className="text-neutral-600">
+                    [
+                  </span>
                   {social.href ? (
                     <a
                       href={social.href}
@@ -100,7 +102,10 @@ export default function Landing() {
                       {social.name}
                     </span>
                   )}
-                </Fragment>
+                  <span aria-hidden="true" className="text-neutral-600">
+                    ]
+                  </span>
+                </span>
               ))}
             </motion.nav>
           </div>
