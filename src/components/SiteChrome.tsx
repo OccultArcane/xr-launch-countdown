@@ -19,7 +19,9 @@ const HEADER_LINKS = [
 export function SiteHeader() {
   return (
     <header className="border-b border-white/10">
-      <div className="mx-auto flex min-h-14 w-full max-w-5xl items-center justify-between gap-4 px-6">
+      {/* The row wraps instead of pushing the links past the right edge on a
+          narrow phone, where the larger type steps are already applied. */}
+      <div className="mx-auto flex min-h-14 w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-6 py-2">
         <span className="whitespace-nowrap text-[10px] tracking-[0.06em] text-neutral-200 @sm:text-sm @sm:tracking-[0.35em]">
           Supported Creators
         </span>

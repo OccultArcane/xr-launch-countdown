@@ -24,14 +24,16 @@ export default function Landing() {
     document.title = `${SITE.name} — IMVU storefront`;
   }, []);
 
-  // The whole page lives inside the fixed 926 × 700 stage: it scales to
-  // fit any screen, device or iframe while keeping this exact layout.
+  // The page fills the viewport: header on the top edge, footer on the
+  // bottom edge, and the storefront column taking all the space between
+  // them, sized by the stage's container queries rather than a scale
+  // factor.
   return (
     <Stage>
-      <div className="flex flex-col bg-[#0a0a0a] font-mono text-neutral-100 selection:bg-neutral-100 selection:text-[#0a0a0a]">
+      <div className="flex flex-1 flex-col bg-[#0a0a0a] font-mono text-neutral-100 selection:bg-neutral-100 selection:text-[#0a0a0a]">
         <SiteHeader />
 
-        <main className="flex flex-1 items-center justify-center px-6 py-6">
+        <main className="flex flex-1 items-center justify-center px-6 py-4">
           <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 @sm:gap-8">
             <h1 className="sr-only">xr — IMVU storefront</h1>
 

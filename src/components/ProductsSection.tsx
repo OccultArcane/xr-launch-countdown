@@ -117,8 +117,8 @@ function ImvuFeed({ onProducts }: { onProducts: (items: Product[]) => void }) {
 /**
  * The catalog beside the mark: square tiles stacked on top of each other —
  * a column on each side of the mark, or one full stack under it when the
- * container is too narrow for the row (breakpoints query the fixed-size
- * stage container, so every device shows the same arrangement).
+ * container is too narrow for the row (breakpoints query the full-width
+ * stage container, so the arrangement follows the space available).
  * The tiles fill from the live feed (latest 4 by creation date) and keep
  * the built-in catalog whenever the feed is unavailable; each one links
  * straight out to its item on IMVU.
@@ -168,8 +168,12 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
           <Stack items={left} className="order-1 hidden @lg:grid" />
         )}
 
-        {/* The mark: x's and r's assembling your logo silhouette */}
-        <div className="order-1 h-[440px] w-full @lg:order-2 @lg:w-auto @lg:flex-1">
+        {/* The mark: x's and r's assembling your logo silhouette. It takes
+            whatever height the rest of the page leaves — the header, footer,
+            countdown and support row account for roughly 480px — so the
+            storefront fills the screen instead of floating in it, capped so
+            the mark never grows past the artwork's own size. */}
+        <div className="order-1 h-[clamp(320px,calc(100dvh_-_480px),560px)] w-full @lg:order-2 @lg:w-auto @lg:flex-1">
           {children}
         </div>
 
