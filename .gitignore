@@ -7,3 +7,4 @@ artifacts/
 # imports it directly and it is needed to typecheck or build, so it is
 # tracked: a plain checkout builds without a deployment wired up.
 .convex
+/freebuff-sites-build/
