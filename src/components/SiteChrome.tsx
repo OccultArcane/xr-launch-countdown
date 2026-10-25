@@ -54,40 +54,45 @@ export function SiteHeader() {
         >
           {/* Each channel sits inside its own brackets — [name] — so the
               row reads as a list of links without a separator between.
-              The whole unit bumps left when its link is hovered: shifting
-              only the name would slide it out from under its own brackets. */}
+              The whole unit bumps left on hover: shifting only the name
+              would slide it out from under its own brackets. The unit's box
+              is what the pointer hovers and it stays put, with the bump on
+              the row inside it — a moving hit area pulls its own border out
+              from under the cursor, loses it, and catches it again. */}
           {SOCIALS.map((social) => (
             <span
               key={social.full}
-              className="inline-flex items-center whitespace-nowrap transition-transform duration-150 has-[a:hover]:-translate-x-1"
+              className="group inline-flex items-center whitespace-nowrap"
             >
-              <span aria-hidden="true" className="text-neutral-600">
-                [
-              </span>
-              {social.href ? (
-                <a
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.full}
-                  title={social.full}
-                  className="text-neutral-300 transition-colors duration-150 hover:bg-xr-red hover:text-[#0a0a0a]"
-                >
-                  {social.label}
-                </a>
-              ) : (
-                // No invite yet — dulled and unclickable so it reads as
-                // inactive until its href is filled in.
-                <span
-                  aria-disabled="true"
-                  title={`${social.full} — coming soon`}
-                  className="cursor-default select-none text-neutral-600"
-                >
-                  {social.label}
+              <span className="inline-flex items-center transition-transform duration-150 group-hover:-translate-x-1">
+                <span aria-hidden="true" className="text-neutral-600">
+                  [
                 </span>
-              )}
-              <span aria-hidden="true" className="text-neutral-600">
-                ]
+                {social.href ? (
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.full}
+                    title={social.full}
+                    className="text-neutral-300 transition-colors duration-150 group-hover:bg-xr-red group-hover:text-[#0a0a0a]"
+                  >
+                    {social.label}
+                  </a>
+                ) : (
+                  // No invite yet — dulled and unclickable so it reads as
+                  // inactive until its href is filled in.
+                  <span
+                    aria-disabled="true"
+                    title={`${social.full} — coming soon`}
+                    className="cursor-default select-none text-neutral-600"
+                  >
+                    {social.label}
+                  </span>
+                )}
+                <span aria-hidden="true" className="text-neutral-600">
+                  ]
+                </span>
               </span>
             </span>
           ))}

@@ -73,6 +73,11 @@ export default function Landing() {
               </p>
 
               <div className="mt-2.5 flex flex-wrap items-center justify-center gap-3 @sm:mt-3 @sm:gap-3.5 short:mt-2 short:gap-2.5 shorter:mt-1.5 shorter:gap-2">
+                {/* The link's box is the hover target, and it never moves: the
+                    bump happens on the layer inside it. Sliding the link itself
+                    put its edge out from under a cursor sitting on the border,
+                    which dropped the hover, slid the link back under that
+                    cursor, and repeated — a flicker along that border. */}
                 {SUPPORTED_CREATORS.map((creator) => (
                   <a
                     key={creator.id}
@@ -80,44 +85,46 @@ export default function Landing() {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={`${creator.label} on IMVU`}
-                    className="viewfinder group relative inline-flex items-center gap-2 bg-[#0a0a0a] py-1.5 pr-2.5 pl-1.5 outline-none transition-[transform,background-color] duration-150 hover:-translate-x-1 hover:bg-white/[0.04] short:py-1 short:pr-2 short:pl-1 shorter:py-0.5"
+                    className="group relative inline-flex outline-none"
                   >
-                    {/* The avatar is decorative — the name beside it is the
-                        link's text — so it stays out of the accessibility
-                        tree. It is loaded live from IMVU, so a creator's new
-                        avatar shows up on its own; the copy in public/ stands
-                        in only when that request fails. Muted by default, in
-                        colour on hover/focus. */}
-                    <img
-                      src={creator.image}
-                      alt=""
-                      width={52}
-                      height={72}
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      onError={(event) => {
-                        const img = event.currentTarget;
-                        if (img.dataset.fallback === "done") {
-                          // IMVU unreachable and no local copy either — drop
-                          // the frame rather than show a broken-image glyph.
-                          img.style.visibility = "hidden";
-                          return;
-                        }
-                        img.dataset.fallback = "done";
-                        img.src = creator.fallback;
-                      }}
-                      className="block h-[72px] w-[52px] shrink-0 object-cover grayscale transition-[filter] duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0 short:h-[56px] short:w-[40px] shorter:h-[44px] shorter:w-[32px]"
-                    />
-                    {/* The name carries the same red as "Shop" in the label
-                        above; the brackets stay neutral so the accent sits on
-                        the name alone. */}
-                    <span className="inline-flex items-center whitespace-nowrap text-[12px] tracking-[0.12em] text-xr-red transition-colors group-hover:text-white">
-                      <span aria-hidden="true" className="text-neutral-600">
-                        [
-                      </span>
-                      {creator.label}
-                      <span aria-hidden="true" className="text-neutral-600">
-                        ]
+                    <span className="viewfinder inline-flex items-center gap-2 bg-[#0a0a0a] py-1.5 pr-2.5 pl-1.5 transition-[transform,background-color] duration-150 group-hover:-translate-x-1 group-hover:bg-white/[0.04] short:py-1 short:pr-2 short:pl-1 shorter:py-0.5">
+                      {/* The avatar is decorative — the name beside it is the
+                          link's text — so it stays out of the accessibility
+                          tree. It is loaded live from IMVU, so a creator's new
+                          avatar shows up on its own; the copy in public/ stands
+                          in only when that request fails. Muted by default, in
+                          colour on hover/focus. */}
+                      <img
+                        src={creator.image}
+                        alt=""
+                        width={52}
+                        height={72}
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={(event) => {
+                          const img = event.currentTarget;
+                          if (img.dataset.fallback === "done") {
+                            // IMVU unreachable and no local copy either — drop
+                            // the frame rather than show a broken-image glyph.
+                            img.style.visibility = "hidden";
+                            return;
+                          }
+                          img.dataset.fallback = "done";
+                          img.src = creator.fallback;
+                        }}
+                        className="block h-[72px] w-[52px] shrink-0 object-cover grayscale transition-[filter] duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0 short:h-[56px] short:w-[40px] shorter:h-[44px] shorter:w-[32px]"
+                      />
+                      {/* The name carries the same red as "Shop" in the label
+                          above; the brackets stay neutral so the accent sits on
+                          the name alone. */}
+                      <span className="inline-flex items-center whitespace-nowrap text-[12px] tracking-[0.12em] text-xr-red transition-colors group-hover:text-white">
+                        <span aria-hidden="true" className="text-neutral-600">
+                          [
+                        </span>
+                        {creator.label}
+                        <span aria-hidden="true" className="text-neutral-600">
+                          ]
+                        </span>
                       </span>
                     </span>
                   </a>

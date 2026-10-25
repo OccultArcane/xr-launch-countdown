@@ -120,7 +120,7 @@ function BackendNotice() {
         </p>
         <Link
           to="/"
-          className="glitch-hover mt-8 inline-block border border-white/20 px-5 py-3 text-[11px] uppercase tracking-[0.3em] text-neutral-100 transition-colors hover:border-white hover:bg-white hover:text-[#0a0a0a]"
+          className="mt-8 inline-block border border-white/20 px-5 py-3 text-[11px] uppercase tracking-[0.3em] text-neutral-100 transition-colors hover:border-white hover:bg-white hover:text-[#0a0a0a]"
         >
           ← back to the store
         </Link>

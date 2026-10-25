@@ -6,8 +6,13 @@ import { hasConvex } from "@/lib/convex";
 import { fetchLatestProducts } from "@/lib/productsFeed";
 import { PRODUCTS, SITE, type Product } from "@/lib/store";
 
+/* The link is the hit area, so it holds the width and never moves. */
 const TILE_CLASS =
-  "viewfinder group flex w-[144px] flex-col bg-[#0a0a0a] p-3 outline-none transition-[transform,background-color] duration-150 hover:bg-white/[0.03] focus-visible:bg-white/[0.03] @sm:p-4 @xl:w-[156px] short:w-[124px] short:p-3 shorter:w-[108px] shorter:p-2.5";
+  "group relative flex w-[144px] flex-col outline-none @xl:w-[156px] short:w-[124px] shorter:w-[108px]";
+
+/* Everything visible — frame, artwork, price — bumps inside it. */
+const TILE_FRAME_CLASS =
+  "viewfinder flex flex-1 flex-col bg-[#0a0a0a] p-3 transition-[transform,background-color] duration-150 group-hover:bg-white/[0.03] group-focus-visible:bg-white/[0.03] @sm:p-4 short:p-3 short:p-2.5";
 
 function Tile({
   product,
@@ -67,17 +72,28 @@ function Tile({
 
   // Every tile opens the item's own page on IMVU in a new tab, so a click
   // lands on the shop listing the visitor can actually buy from.
+  //
+  // The link box is the hit area and stays exactly where the stack puts it;
+  // the frame inside is what moves. Sliding the link itself pulled its edge
+  // out from under a cursor resting on that borderline, which dropped the
+  // hover, slid the link back under the cursor, and repeated.
   return (
     <a
       href={product.url || SITE.storeUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={
-        TILE_CLASS +
-        (nudge === "right" ? " hover:translate-x-1" : " hover:-translate-x-1")
-      }
+      className={TILE_CLASS}
     >
-      {body}
+      <span
+        className={
+          TILE_FRAME_CLASS +
+          (nudge === "right"
+            ? " group-hover:translate-x-1"
+            : " group-hover:-translate-x-1")
+        }
+      >
+        {body}
+      </span>
     </a>
   );
 }

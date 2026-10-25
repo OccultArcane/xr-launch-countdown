@@ -174,63 +174,14 @@
 }
 
 .viewfinder:hover,
-.viewfinder:focus-visible {
+.viewfinder:focus-visible,
+/* The frame sits inside the link and slides with its bump, so the link's own
+   hover and focus drive it too — otherwise the brackets stay dim whenever the
+   pointer rests on the few pixels the artwork has slid away from. */
+.group:hover .viewfinder,
+.group:focus-visible .viewfinder {
   --vf-color: rgba(255, 255, 255, 1);
   --vf-arm: 20px;
-}
-
-/* ── Glitch hover for links ─────────────────────────────────────────── */
-.glitch-hover {
-  text-decoration: none !important;
-}
-
-@keyframes xr-glitch {
-  0%,
-  100% {
-    transform: translate(0, 0);
-    filter: none;
-    clip-path: inset(0 0 0 0);
-  }
-  15% {
-    transform: translate(-1.5px, 0.5px);
-    filter: drop-shadow(1px 0 rgba(248, 72, 72, 0.4))
-      drop-shadow(-1px 0 rgba(72, 220, 248, 0.4));
-    clip-path: inset(0 0 0 0);
-  }
-  30% {
-    transform: translate(1.5px, -0.5px);
-    filter: none;
-    clip-path: inset(0 0 12% 0);
-  }
-  45% {
-    transform: translate(-1px, 0);
-    filter: drop-shadow(1px 0 rgba(248, 72, 72, 0.3))
-      drop-shadow(-1px 0 rgba(72, 220, 248, 0.3));
-    clip-path: inset(0 0 0 0);
-  }
-  60% {
-    transform: translate(1px, 0.5px);
-    filter: none;
-    clip-path: inset(9% 0 0 0);
-  }
-  75% {
-    transform: translate(-1.5px, -0.5px);
-    filter: drop-shadow(1px 0 rgba(248, 72, 72, 0.35))
-      drop-shadow(-1px 0 rgba(72, 220, 248, 0.35));
-    clip-path: inset(0 0 0 0);
-  }
-  90% {
-    transform: translate(0.5px, 0);
-    filter: drop-shadow(0.5px 0 rgba(248, 72, 72, 0.2))
-      drop-shadow(-0.5px 0 rgba(72, 220, 248, 0.2));
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .glitch-hover:hover {
-    animation: xr-glitch 0.8s steps(3, end) infinite;
-  }
 }
 
 /* ── Pulsing NEW dot ──────────────────────────────────────────── */
