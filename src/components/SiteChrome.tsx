@@ -14,11 +14,13 @@ export function SiteHeader() {
           className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] @sm:text-[11px] @sm:tracking-[0.18em]"
         >
           {/* Each channel sits inside its own brackets — [name] — so the
-              row reads as a list of links without a separator between. */}
+              row reads as a list of links without a separator between.
+              The whole unit bumps left when its link is hovered: shifting
+              only the name would slide it out from under its own brackets. */}
           {SOCIALS.map((social) => (
             <span
               key={social.full}
-              className="inline-flex items-center whitespace-nowrap"
+              className="inline-flex items-center whitespace-nowrap transition-transform duration-150 has-[a:hover]:-translate-x-1"
             >
               <span aria-hidden="true" className="text-neutral-600">
                 [
@@ -30,7 +32,7 @@ export function SiteHeader() {
                   rel="noopener noreferrer"
                   aria-label={social.full}
                   title={social.full}
-                  className="text-neutral-300 transition-[transform,background-color,color] duration-150 hover:translate-x-1 hover:bg-xr-red hover:text-[#0a0a0a]"
+                  className="text-neutral-300 transition-colors duration-150 hover:bg-xr-red hover:text-[#0a0a0a]"
                 >
                   {social.label}
                 </a>
