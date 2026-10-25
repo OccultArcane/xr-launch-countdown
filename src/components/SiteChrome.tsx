@@ -1,14 +1,53 @@
+import { useEffect, useState } from "react";
 import { NotificationSegment } from "./NotificationSegment";
 import { SOCIALS } from "@/lib/links";
+
+/** Two digits, so the clock keeps one width as it counts. */
+const pad = (value: number) => String(value).padStart(2, "0");
+
+/**
+ * The visitor's own clock, in the header's bracket style — `[ 20:42:07 ]`.
+ * Built from the system clock rather than a locale format so the digits stay
+ * the shape the monospace face was drawn for, and tabular so the readout
+ * cannot jog sideways as the seconds turn.
+ */
+function LocalTime() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const clock =
+    `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  return (
+    <time
+      dateTime={now.toISOString()}
+      className="inline-flex items-center text-[9px] tracking-[0.1em] tabular-nums text-neutral-300 @sm:text-[11px] @sm:tracking-[0.18em]"
+    >
+      <span aria-hidden="true" className="text-neutral-600">
+        [
+      </span>
+      {clock}
+      <span aria-hidden="true" className="text-neutral-600">
+        ]
+      </span>
+    </time>
+  );
+}
 
 export function SiteHeader() {
   return (
     <header className="border-b border-white/10">
       {/* The row wraps instead of pushing the links past the right edge on a
           narrow phone, where the larger type steps are already applied. */}
-      {/* No label — the row is the studio's channels, right-aligned, so it
-          needs no heading of its own. */}
-      <div className="mx-auto flex min-h-14 w-full max-w-5xl flex-wrap items-center justify-end gap-x-4 gap-y-1 px-6 py-2 short:min-h-12">
+      {/* No label — the row pairs the visitor's clock at the left edge with
+          the studio's channels at the right, so the run needs no heading of
+          its own. */}
+      <div className="mx-auto flex min-h-14 w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-6 py-2 short:min-h-12">
+        <LocalTime />
         <nav
           aria-label="socials"
           className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] @sm:text-[11px] @sm:tracking-[0.18em]"
