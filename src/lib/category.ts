@@ -16,11 +16,8 @@ const SHELVES: [shelf: string, pattern: RegExp][] = [
   [
     "clothing",
     /\b(cloth|outfit|shirt|top|dress|skirt|pants|jeans|short|jacket|coat|hoodie|sweater|uniform|lingerie|underwear|swim|shoe|boot|sneaker|heel)\w*/,
-  ],
-  [
-    "accessories",
-    /\b(accessor|jewel|necklace|ring|bracelet|earring|piercing|hat|cap|bag|purse|glass|belt|watch|scarf|glove|mask|nail)\w*/,
-  ],
+  ],["accessories", /\b(accessor|jewel|necklace|ring|bracelet|earring|piercing|hat|cap|bag|purse|glass|belt|watch|scarf|glove|mask|nail)\w*/],",
+  ["male accessories", /\b(male|men\'?s|man)\w*/],
   [
     "makeup",
     /\b(make ?up|cosmetic|lip|lash|brow|eyeliner|eyeshadow|blush|foundation)\w*/,
