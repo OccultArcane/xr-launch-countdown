@@ -105,15 +105,23 @@ export function NotificationSegment() {
               />
               notice
             </span>
-            <p className="min-w-0 truncate text-[10px] tracking-[0.08em] text-neutral-400 @sm:text-[11px]">
+            {/* A phone gives the line roughly half the width it needs, so it
+                wraps onto as many lines as the sentence takes rather than
+                ellipsing the rest of the notice away. On a wide screen the
+                row has room for the whole sentence, so it settles on one line
+                there without needing a cut-off. */}
+            <p className="relative min-w-0 break-words text-center text-[10px] tracking-[0.08em] text-neutral-400 @sm:text-[11px]">
               {/* Full line for screen readers; the typing is visual only. */}
               <span className="sr-only">{text}</span>
-              <span aria-hidden="true">{shown}</span>
-              <span
-                aria-hidden="true"
-                className="animate-pulse text-neutral-200"
-              >
-                ▌
+              {/* The finished sentence, invisible, holds the height the notice
+                  will occupy once typed. Without it every wrap adds a line
+                  mid-type and shoves the page down under the reader. */}
+              <span aria-hidden="true" className="invisible">
+                {text}
+              </span>
+              <span aria-hidden="true" className="absolute inset-0">
+                {shown}
+                <span className="animate-pulse text-neutral-200">▌</span>
               </span>
             </p>
             <button
