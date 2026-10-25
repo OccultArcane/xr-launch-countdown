@@ -15,7 +15,8 @@ This project uses the following tech stack:
 
 All relevant files live in the 'src' directory.
 
-Use bun for the package manager.
+Use npm for the package manager — `package-lock.json` is the one lockfile, and
+CI installs with `npm ci`.
 
 ## The storefront: products, images and hosting
 
