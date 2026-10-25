@@ -170,10 +170,11 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
 
         {/* The mark: x's and r's assembling your logo silhouette. It takes
             whatever height the rest of the page leaves — the header, footer,
-            countdown and support row account for roughly 480px — so the
-            storefront fills the screen instead of floating in it, capped so
-            the mark never grows past the artwork's own size. */}
-        <div className="order-1 h-[clamp(320px,calc(100dvh_-_480px),560px)] w-full @lg:order-2 @lg:w-auto @lg:flex-1">
+            countdown and the creator row account for roughly 585px, measured
+            in a browser — so the storefront fills the screen instead of
+            floating in it, capped so the mark never grows past the artwork's
+            own size. */}
+        <div className="order-1 h-[clamp(280px,calc(100dvh_-_585px),560px)] w-full @lg:order-2 @lg:w-auto @lg:flex-1">
           {children}
         </div>
 

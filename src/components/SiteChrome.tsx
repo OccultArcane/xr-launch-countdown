@@ -1,52 +1,50 @@
 import { NotificationSegment } from "./NotificationSegment";
-
-/** Supported creators, each linked to their IMVU shop by manufacturers id. */
-const HEADER_LINKS = [
-  {
-    label: "chokinglotus",
-    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=272737258",
-  },
-  {
-    label: "Numen",
-    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=179356122",
-  },
-  {
-    label: "G59",
-    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=119374898",
-  },
-];
+import { SOCIALS } from "@/lib/links";
 
 export function SiteHeader() {
   return (
     <header className="border-b border-white/10">
       {/* The row wraps instead of pushing the links past the right edge on a
           narrow phone, where the larger type steps are already applied. */}
-      <div className="mx-auto flex min-h-14 w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-6 py-2">
-        <span className="whitespace-nowrap text-[10px] tracking-[0.06em] text-neutral-200 @sm:text-sm @sm:tracking-[0.35em]">
-          Supported Creators
-        </span>
+      {/* No label — the row is the studio's channels, right-aligned, so it
+          needs no heading of its own. */}
+      <div className="mx-auto flex min-h-14 w-full max-w-5xl flex-wrap items-center justify-end gap-x-4 gap-y-1 px-6 py-2">
         <nav
-          aria-label="links"
+          aria-label="socials"
           className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] @sm:text-[11px] @sm:tracking-[0.18em]"
         >
-          {/* Each creator sits inside its own brackets — [name] — so the
+          {/* Each channel sits inside its own brackets — [name] — so the
               row reads as a list of links without a separator between. */}
-          {HEADER_LINKS.map((link) => (
+          {SOCIALS.map((social) => (
             <span
-              key={link.label}
+              key={social.full}
               className="inline-flex items-center whitespace-nowrap"
             >
               <span aria-hidden="true" className="text-neutral-600">
                 [
               </span>
-              <a
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glitch-hover text-neutral-300 transition-colors hover:text-white"
-              >
-                {link.label}
-              </a>
+              {social.href ? (
+                <a
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.full}
+                  title={social.full}
+                  className="glitch-hover text-neutral-300 transition-colors hover:text-white"
+                >
+                  {social.label}
+                </a>
+              ) : (
+                // No invite yet — dulled and unclickable so it reads as
+                // inactive until its href is filled in.
+                <span
+                  aria-disabled="true"
+                  title={`${social.full} — coming soon`}
+                  className="cursor-default select-none text-neutral-600"
+                >
+                  {social.label}
+                </span>
+              )}
               <span aria-hidden="true" className="text-neutral-600">
                 ]
               </span>
