@@ -40,7 +40,10 @@ The tiles fall through three layers, in this order:
 
 * `npm run build` — normal root-relative build for any host, including the Freebuff preview.
 * `npm run build:pages` — builds for GitHub Pages at `/<repo>/` and writes `dist/404.html`,
-  so deep links such as `/<repo>/products/76161696` boot the app instead of 404ing.
+  so deep links such as `/<repo>/products/76161696` boot the app instead of 404ing. It first
+  runs `npm run check-creators`, which fails the build when a supported creator's live IMVU
+  avatar no longer resolves — an unknown id answers with IMVU's placeholder picture, so the
+  response is hashed and compared against it rather than trusted on status alone.
 * `.github/workflows/deploy-pages.yml` — runs both on every push to `main` and deploys.
   Enable it once under Settings → Pages → Build and deployment → Source: GitHub Actions.
 

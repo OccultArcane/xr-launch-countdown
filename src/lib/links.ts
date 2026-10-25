@@ -40,31 +40,26 @@ export const creatorAvatarUrl = (manufacturersId: string) =>
   `https://www.imvu.com/catalog/image_avatar.php?cid=${manufacturersId}`;
 
 /**
- * Supported creators, each linked to their IMVU shop by manufacturers id.
- * `image` is the creator's live avatar (see creatorAvatarUrl); `fallback` is
- * a copy in public/creators used only when IMVU cannot be reached, so the
- * row still shows a face offline.
+ * The creators the studio backs, as their IMVU manufacturer id — the one
+ * value that identifies them in both their shop link and their avatar — plus
+ * the file in public/creators that stands in while IMVU is unreachable.
+ *
+ * `scripts/check-creators.mjs` reads this list straight out of the source and
+ * fails the build when an avatar stops resolving, so keep each entry on one
+ * line in this shape (`label`, `id`, `avatar`); the shop link, live avatar
+ * and fallback are derived below.
  */
-export const SUPPORTED_CREATORS = [
-  {
-    label: "chokinglotus",
-    id: "272737258",
-    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=272737258",
-    image: creatorAvatarUrl("272737258"),
-    fallback: asset("creators/chokinglotus.jpg"),
-  },
-  {
-    label: "Numen",
-    id: "179356122",
-    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=179356122",
-    image: creatorAvatarUrl("179356122"),
-    fallback: asset("creators/numen.jpg"),
-  },
-  {
-    label: "G59",
-    id: "119374898",
-    href: "https://www.imvu.com/shop/web_search.php?manufacturers_id=119374898",
-    image: creatorAvatarUrl("119374898"),
-    fallback: asset("creators/g59.jpg"),
-  },
+const CREATORS: Array<{ label: string; id: string; avatar: string }> = [
+  { label: "chokinglotus", id: "272737258", avatar: "chokinglotus.jpg" },
+  { label: "Numen", id: "179356122", avatar: "numen.jpg" },
+  { label: "G59", id: "119374898", avatar: "g59.jpg" },
 ];
+
+/** Supported creators, each linked to their IMVU shop by manufacturers id. */
+export const SUPPORTED_CREATORS = CREATORS.map((creator) => ({
+  label: creator.label,
+  id: creator.id,
+  href: `https://www.imvu.com/shop/web_search.php?manufacturers_id=${creator.id}`,
+  image: creatorAvatarUrl(creator.id),
+  fallback: asset(`creators/${creator.avatar}`),
+}));

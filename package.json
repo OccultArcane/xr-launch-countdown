@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:pages": "node scripts/build-pages.mjs",
+    "check-creators": "node scripts/check-creators.mjs",
     "refresh-products": "node scripts/refresh-products.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",

@@ -48,6 +48,20 @@
   --color-xr-red: #f84848;
 }
 
+/* Short laptop viewports. The storefront compacts its catalog, countdown and
+   creator row by a step so the footer stays on screen instead of the page
+   scrolling; taller screens keep the roomier sizes. The cut-off is where the
+   roomier layout first fits — measured, its page is 997px tall — so nothing
+   between the two sizes falls in a gap. Used as `short:` alongside the
+   container queries. */
+@custom-variant short (@media (max-height: 996px));
+
+/* Below that, a 900px-tall laptop has roughly 760px of window left once the
+   browser chrome is drawn, so this step compacts again and the footer still
+   lands on screen there. Its cut-off is likewise the height the `short`
+   layout needs (853px), so the tiers meet instead of leaving a gap. */
+@custom-variant shorter (@media (max-height: 852px));
+
 /* CHANGE VALUES FOR THEME */
 :root {
   --radius: 0.625rem;
@@ -129,6 +143,40 @@
   [role="button"]:not([disabled]) {
     cursor: pointer;
   }
+}
+
+/* ── Camera viewfinder frame ───────────────────────────────────────────
+   Four corner brackets instead of a full border — the way a camera frames
+   its sensor — drawn from background gradients so no extra elements are
+   needed. `--vf-arm` and `--vf-color` are the only knobs; a chip widens
+   and brightens the brackets on hover or focus, which reads as a focus
+   lock. */
+.viewfinder {
+  --vf-color: rgba(255, 255, 255, 0.6);
+  --vf-arm: 12px;
+  --vf-line: 1px;
+  background-image: linear-gradient(var(--vf-color), var(--vf-color)),
+    linear-gradient(var(--vf-color), var(--vf-color)),
+    linear-gradient(var(--vf-color), var(--vf-color)),
+    linear-gradient(var(--vf-color), var(--vf-color)),
+    linear-gradient(var(--vf-color), var(--vf-color)),
+    linear-gradient(var(--vf-color), var(--vf-color)),
+    linear-gradient(var(--vf-color), var(--vf-color)),
+    linear-gradient(var(--vf-color), var(--vf-color));
+  background-position: left top, left top, right top, right top, left bottom,
+    left bottom, right bottom, right bottom;
+  background-size: var(--vf-arm) var(--vf-line),
+    var(--vf-line) var(--vf-arm), var(--vf-arm) var(--vf-line),
+    var(--vf-line) var(--vf-arm), var(--vf-arm) var(--vf-line),
+    var(--vf-line) var(--vf-arm), var(--vf-arm) var(--vf-line),
+    var(--vf-line) var(--vf-arm);
+  background-repeat: no-repeat;
+}
+
+.viewfinder:hover,
+.viewfinder:focus-visible {
+  --vf-color: rgba(255, 255, 255, 1);
+  --vf-arm: 20px;
 }
 
 /* ── Glitch hover for links ─────────────────────────────────────────── */

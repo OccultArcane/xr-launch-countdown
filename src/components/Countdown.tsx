@@ -53,7 +53,7 @@ export function Countdown() {
 
   return (
     <section aria-label="drop countdown" className="w-full max-w-3xl">
-      <div className="mb-5 flex items-baseline justify-between text-[10px] uppercase tracking-[0.35em]">
+      <div className="mb-5 flex items-baseline justify-between text-[10px] uppercase tracking-[0.35em] short:mb-3 shorter:mb-2">
         <span className="text-xr-red">
           {dropDay ? "drop day" : "next drop"}
         </span>
@@ -65,7 +65,7 @@ export function Countdown() {
           <div
             key={label}
             className={
-              "px-2 py-6 text-center @sm:py-7 " +
+              "px-2 py-6 text-center @sm:py-7 short:py-4 shorter:py-3 " +
               (index > 0 ? "border-l border-white/10" : "")
             }
           >

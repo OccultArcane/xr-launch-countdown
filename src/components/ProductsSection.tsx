@@ -7,9 +7,16 @@ import { fetchLatestProducts } from "@/lib/productsFeed";
 import { PRODUCTS, SITE, type Product } from "@/lib/store";
 
 const TILE_CLASS =
-  "glitch-hover group flex w-[144px] flex-col border border-white/10 bg-[#0a0a0a] p-3 outline-none transition-colors hover:bg-white/[0.03] focus-visible:bg-white/[0.03] @sm:p-4 @xl:w-[156px]";
+  "viewfinder group flex w-[144px] flex-col bg-[#0a0a0a] p-3 outline-none transition-[transform,background-color] duration-150 hover:bg-white/[0.03] focus-visible:bg-white/[0.03] @sm:p-4 @xl:w-[156px] short:w-[124px] short:p-3 shorter:w-[108px] shorter:p-2.5";
 
-function Tile({ product }: { product: Product }) {
+function Tile({
+  product,
+  nudge = "left",
+}: {
+  product: Product;
+  /** Which way the tile bumps on hover: away from the mark's centre. */
+  nudge?: "left" | "right";
+}) {
   const body = (
     <>
       <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] @sm:text-[9px]">
@@ -42,18 +49,17 @@ function Tile({ product }: { product: Product }) {
         </div>
       )}
 
-      <div className="mt-auto min-w-0">
+      {/* Name and price are centred under the artwork — the whole tile is
+          the link, so no arrow is needed to say it opens something. */}
+      <div className="mt-auto min-w-0 text-center">
         <h3 className="text-[11px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white @sm:text-[12px]">
           {product.name}
         </h3>
       </div>
 
-      <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-white/10 pt-2">
+      <div className="mt-2.5 flex items-center justify-center border-t border-white/10 pt-2 text-center">
         <span className="min-w-0 truncate text-[10px] tabular-nums text-neutral-300">
           {product.price}
-        </span>
-        <span className="shrink-0 text-[11px] text-neutral-500 transition-colors group-hover:text-neutral-200">
-          →
         </span>
       </div>
     </>
@@ -66,18 +72,34 @@ function Tile({ product }: { product: Product }) {
       href={product.url || SITE.storeUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={TILE_CLASS}
+      className={
+        TILE_CLASS +
+        (nudge === "right" ? " hover:translate-x-1" : " hover:-translate-x-1")
+      }
     >
       {body}
     </a>
   );
 }
 
-function Stack({ items, className }: { items: Product[]; className: string }) {
+function Stack({
+  items,
+  className,
+  nudge,
+}: {
+  items: Product[];
+  className: string;
+  nudge?: "left" | "right";
+}) {
   return (
-    <div className={"grid shrink-0 grid-cols-1 gap-2.5 " + className}>
+    <div
+      className={
+        "grid shrink-0 grid-cols-1 gap-2.5 short:gap-2 shorter:gap-1.5 " +
+        className
+      }
+    >
       {items.map((product) => (
-        <Tile key={product.id} product={product} />
+        <Tile key={product.id} product={product} nudge={nudge} />
       ))}
     </div>
   );
@@ -164,8 +186,10 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
     >
       {feed}
       <div className="flex w-full flex-col items-center gap-8 @lg:flex-row @lg:items-center @lg:gap-6">
+        {/* Left of the mark bumps left, right of it bumps right, so each
+            side moves away from the centre. */}
         {hasProducts && (
-          <Stack items={left} className="order-1 hidden @lg:grid" />
+          <Stack items={left} className="order-1 hidden @lg:grid" nudge="left" />
         )}
 
         {/* The mark: x's and r's assembling your logo silhouette. It takes
@@ -173,13 +197,15 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
             countdown and the creator row account for roughly 585px, measured
             in a browser — so the storefront fills the screen instead of
             floating in it, capped so the mark never grows past the artwork's
-            own size. */}
-        <div className="order-1 h-[clamp(280px,calc(100dvh_-_585px),560px)] w-full @lg:order-2 @lg:w-auto @lg:flex-1">
+            own size. The floor is where that budget runs out on a short
+            laptop, and the `short:` steps above have already compacted the
+            catalog and chrome by then. */}
+        <div className="order-1 h-[clamp(270px,calc(100dvh_-_585px),560px)] w-full @lg:order-2 @lg:w-auto @lg:flex-1">
           {children}
         </div>
 
         {hasProducts && (
-          <div className="order-2 grid w-fit grid-cols-1 gap-2.5 @lg:hidden">
+          <div className="order-2 grid w-fit grid-cols-1 gap-2.5 short:gap-2 @lg:hidden">
             {products.map((product) => (
               <Tile key={product.id} product={product} />
             ))}
@@ -187,7 +213,11 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
         )}
 
         {hasProducts && (
-          <Stack items={right} className="order-3 hidden @lg:grid" />
+          <Stack
+            items={right}
+            className="order-3 hidden @lg:grid"
+            nudge="right"
+          />
         )}
       </div>
     </motion.section>

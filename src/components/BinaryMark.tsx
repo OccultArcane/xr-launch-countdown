@@ -480,10 +480,13 @@ export function BinaryMark({
         1,
         Math.min(4, dpr * Math.min(4, Math.max(0.25, visual))),
       );
+      // Only the backing store is sized here. The canvas fills its wrapper
+      // through CSS (`h-full w-full`) rather than an inline pixel width: a
+      // fixed width made the canvas a replaced element the flex row could
+      // not shrink below, so the storefront could end up wider than the
+      // window after a resize.
       canvas.width = Math.round(width * quality);
       canvas.height = Math.round(height * quality);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
       ctx.setTransform(quality, 0, 0, quality, 0, 0);
 
       // Tiny glyphs on a tight grid: thousands of them build the monogram.

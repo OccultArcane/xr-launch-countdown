@@ -8,7 +8,7 @@ export function SiteHeader() {
           narrow phone, where the larger type steps are already applied. */}
       {/* No label — the row is the studio's channels, right-aligned, so it
           needs no heading of its own. */}
-      <div className="mx-auto flex min-h-14 w-full max-w-5xl flex-wrap items-center justify-end gap-x-4 gap-y-1 px-6 py-2">
+      <div className="mx-auto flex min-h-14 w-full max-w-5xl flex-wrap items-center justify-end gap-x-4 gap-y-1 px-6 py-2 short:min-h-12">
         <nav
           aria-label="socials"
           className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] @sm:text-[11px] @sm:tracking-[0.18em]"
@@ -30,7 +30,7 @@ export function SiteHeader() {
                   rel="noopener noreferrer"
                   aria-label={social.full}
                   title={social.full}
-                  className="glitch-hover text-neutral-300 transition-colors hover:text-white"
+                  className="text-neutral-300 transition-[transform,background-color,color] duration-150 hover:translate-x-1 hover:bg-xr-red hover:text-[#0a0a0a]"
                 >
                   {social.label}
                 </a>
@@ -62,7 +62,7 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/10">
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-2.5 px-6 py-7 text-center">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-2.5 px-6 py-7 text-center short:py-5 shorter:py-3">
         <p className="text-[9px] tracking-[0.18em] text-xr-red @sm:text-[11px] @sm:tracking-[0.28em]">
           ALL THEFT WILL RESULT IN DMCA CONSEQUENCES
         </p>

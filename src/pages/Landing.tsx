@@ -22,12 +22,12 @@ export default function Landing() {
       <div className="flex flex-1 flex-col bg-[#0a0a0a] font-mono text-neutral-100 selection:bg-neutral-100 selection:text-[#0a0a0a]">
         <SiteHeader />
 
-        <main className="flex flex-1 items-center justify-center px-6 py-4">
-          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 @sm:gap-8">
+        <main className="flex flex-1 items-center justify-center px-6 py-4 short:py-2.5 shorter:py-1.5">
+          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 @sm:gap-8 short:gap-4 shorter:gap-3">
             <h1 className="sr-only">xr — IMVU storefront</h1>
 
             {/* Mark, catalog and countdown kept tight together */}
-            <div className="flex w-full flex-col items-center gap-6 @sm:gap-8">
+            <div className="flex w-full flex-col items-center gap-6 @sm:gap-8 short:gap-4 shorter:gap-3">
               <MarkWithProducts>
                 <BinaryMark
                   text={SITE.maskText}
@@ -72,7 +72,7 @@ export default function Landing() {
                 <span className="text-xr-red">Shop</span> these creators
               </p>
 
-              <div className="mt-2.5 flex flex-wrap items-center justify-center gap-2 @sm:mt-3 @sm:gap-2.5">
+              <div className="mt-2.5 flex flex-wrap items-center justify-center gap-3 @sm:mt-3 @sm:gap-3.5 short:mt-2 short:gap-2.5 shorter:mt-1.5 shorter:gap-2">
                 {SUPPORTED_CREATORS.map((creator) => (
                   <a
                     key={creator.id}
@@ -80,7 +80,7 @@ export default function Landing() {
                     target="_blank"
                     rel="noopener noreferrer"
                     title={`${creator.label} on IMVU`}
-                    className="group inline-flex items-center gap-2 border border-white/10 bg-[#0a0a0a] py-1.5 pr-2.5 pl-1.5 transition-colors hover:border-white/30 hover:bg-white/[0.04]"
+                    className="viewfinder group relative inline-flex items-center gap-2 bg-[#0a0a0a] py-1.5 pr-2.5 pl-1.5 outline-none transition-[transform,background-color] duration-150 hover:-translate-x-1 hover:bg-white/[0.04] short:py-1 short:pr-2 short:pl-1 shorter:py-0.5"
                   >
                     {/* The avatar is decorative — the name beside it is the
                         link's text — so it stays out of the accessibility
@@ -106,9 +106,12 @@ export default function Landing() {
                         img.dataset.fallback = "done";
                         img.src = creator.fallback;
                       }}
-                      className="block h-[72px] w-[52px] shrink-0 object-cover grayscale transition-[filter] duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0"
+                      className="block h-[72px] w-[52px] shrink-0 object-cover grayscale transition-[filter] duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0 short:h-[56px] short:w-[40px] shorter:h-[44px] shorter:w-[32px]"
                     />
-                    <span className="inline-flex items-center whitespace-nowrap text-[12px] tracking-[0.12em] text-neutral-300 transition-colors group-hover:text-white">
+                    {/* The name carries the same red as "Shop" in the label
+                        above; the brackets stay neutral so the accent sits on
+                        the name alone. */}
+                    <span className="inline-flex items-center whitespace-nowrap text-[12px] tracking-[0.12em] text-xr-red transition-colors group-hover:text-white">
                       <span aria-hidden="true" className="text-neutral-600">
                         [
                       </span>
