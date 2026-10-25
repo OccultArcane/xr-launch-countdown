@@ -5,7 +5,7 @@ import { asset } from "@/lib/asset";
 /** Where the notice lives — edited without touching any code. */
 const DOC_URL = asset("notification.txt");
 /** Used only when the document can't be read — keep in sync with it. */
-const FALLBACK_TEXT = "Discord server is in devolpment";
+const FALLBACK_TEXT = "Discord server is in development";
 /** Milliseconds per tick of the typewriter — one character typed per tick. */
 const TYPE_MS = 55;
 /** Pause on the finished line before it starts deleting — 30 seconds. */

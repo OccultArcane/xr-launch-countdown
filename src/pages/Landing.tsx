@@ -84,7 +84,6 @@ export default function Landing() {
                     href={creator.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title={`${creator.label} on IMVU`}
                     className="group relative inline-flex outline-none"
                   >
                     <span className="viewfinder inline-flex items-center gap-2 bg-[#0a0a0a] py-1.5 pr-2.5 pl-1.5 transition-[transform,background-color] duration-150 group-hover:-translate-x-1 group-hover:bg-white/[0.04] short:py-1 short:pr-2 short:pl-1 shorter:py-0.5">

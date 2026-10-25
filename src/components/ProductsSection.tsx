@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useAction } from "convex/react";
 import { motion } from "framer-motion";
 import { api } from "@/convex/_generated/api";
+import { categoryGroup } from "@/lib/category";
 import { hasConvex } from "@/lib/convex";
 import { fetchLatestProducts } from "@/lib/productsFeed";
 import { PRODUCTS, SITE, type Product } from "@/lib/store";
@@ -32,7 +33,12 @@ function Tile({
           />
           new
         </span>
-        <span className="truncate text-neutral-500">{product.category}</span>
+        {/* The feed's breadcrumb folded onto a shelf — "Floor & Wall
+            Decor" reads `decor` here, so the tags group instead of each
+            spelling claiming its own line. */}
+        <span className="truncate text-neutral-500">
+          {categoryGroup(product.category)}
+        </span>
       </div>
 
       {/* Image — full tile width at its natural height, never cropped */}
