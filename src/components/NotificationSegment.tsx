@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { asset } from "@/lib/asset";
 
@@ -82,6 +82,31 @@ export function NotificationSegment() {
     return () => window.clearInterval(id);
   }, [text, reduceMotion]);
 
+  const lineRef = useRef<HTMLParagraphElement>(null);
+  const fullRef = useRef<HTMLSpanElement>(null);
+  const [fit, setFit] = useState(1);
+
+  // The notice is always a single line: the finished sentence is measured
+  // against the row and scaled down when the row is narrower than it, so the
+  // whole notice stays visible instead of wrapping or ellipsing its end off.
+  // The invisible full-text copy is what gets measured — never the scaled
+  // line — so the reading cannot shrink itself in a loop.
+  useLayoutEffect(() => {
+    const line = lineRef.current;
+    const full = fullRef.current;
+    if (!line || !full) return;
+    const measure = () => {
+      const available = line.clientWidth;
+      const natural = full.offsetWidth;
+      setFit(natural > available && available > 0 ? available / natural : 1);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(line);
+    observer.observe(full);
+    return () => observer.disconnect();
+  }, [text]);
+
   const shown = reduceMotion ? text : typed;
 
   return (
@@ -97,27 +122,41 @@ export function NotificationSegment() {
           role="status"
           aria-live="polite"
         >
-          <div className="mx-auto flex w-full items-center justify-center gap-3 px-6 py-2.5">
-            <span className="flex shrink-0 items-center gap-1.5 text-[9px] uppercase tracking-[0.25em] text-xr-red @sm:text-[10px]">
+          <div className="flex w-full items-center justify-center gap-[clamp(0.375rem,1.2vmin,0.75rem)] px-[clamp(0.75rem,3vw,3rem)] py-[clamp(0.375rem,1.2vh,0.75rem)]">
+            <span className="flex shrink-0 items-center gap-1.5 text-[clamp(9px,1.05vmin,12px)] uppercase tracking-[0.25em] text-xr-red">
               <span
                 className="blink-dot h-1.5 w-1.5 rounded-full bg-xr-red"
                 aria-hidden="true"
               />
               notice
             </span>
-            {/* A phone gives the line roughly half the width it needs, so it
-                wraps onto as many lines as the sentence takes rather than
-                ellipsing the rest of the notice away. On a wide screen the
-                row has room for the whole sentence, so it settles on one line
-                there without needing a cut-off. */}
-            <p className="relative min-w-0 break-words text-center text-[10px] tracking-[0.08em] text-neutral-400 @sm:text-[11px]">
+            {/* One line, never two: the row keeps the sentence whole and
+                shrinks it when a phone is too narrow for it (see the
+                measurement above), so no word is ever cut off. */}
+            <p
+              ref={lineRef}
+              style={
+                fit < 1
+                  ? {
+                      transform: `scale(${fit})`,
+                      transformOrigin: "left center",
+                    }
+                  : undefined
+              }
+              className="relative min-w-0 overflow-hidden whitespace-nowrap text-[clamp(10px,1.1vmin,14px)] tracking-[0.08em] text-neutral-400"
+            >
               {/* Full line for screen readers; the typing is visual only. */}
               <span className="sr-only">{text}</span>
-              {/* The finished sentence, invisible, holds the height the notice
-                  will occupy once typed. Without it every wrap adds a line
-                  mid-type and shoves the page down under the reader. */}
-              <span aria-hidden="true" className="invisible">
+              {/* The finished sentence, invisible, holds the full width the
+                  typed line grows into, so the row stays put while it types
+                  and the line never re-centres itself mid-sentence. */}
+              <span
+                ref={fullRef}
+                aria-hidden="true"
+                className="invisible inline-block"
+              >
                 {text}
+                <span>▌</span>
               </span>
               <span aria-hidden="true" className="absolute inset-0">
                 {shown}

@@ -19,13 +19,12 @@ function LocalTime() {
     return () => window.clearInterval(id);
   }, []);
 
-  const clock =
-    `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const clock = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
   return (
     <time
       dateTime={now.toISOString()}
-      className="inline-flex items-center text-[9px] tracking-[0.1em] tabular-nums text-neutral-300 @sm:text-[11px] @sm:tracking-[0.18em]"
+      className="inline-flex items-center text-[clamp(9px,1.1vmin,13px)] tracking-[0.1em] tabular-nums text-neutral-300"
     >
       <span aria-hidden="true" className="text-neutral-600">
         [
@@ -46,11 +45,11 @@ export function SiteHeader() {
       {/* No label — the row pairs the visitor's clock at the left edge with
           the studio's channels at the right, so the run needs no heading of
           its own. */}
-      <div className="mx-auto flex min-h-14 w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-6 py-2 short:min-h-12">
+      <div className="flex min-h-[clamp(2.75rem,6vh,4rem)] w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 px-[clamp(0.75rem,3vw,3rem)] py-[clamp(0.25rem,1vh,0.75rem)]">
         <LocalTime />
         <nav
           aria-label="socials"
-          className="flex flex-wrap items-center justify-end gap-x-2 text-[9px] tracking-[0.1em] @sm:text-[11px] @sm:tracking-[0.18em]"
+          className="flex flex-wrap items-center justify-end gap-x-2 text-[clamp(9px,1.1vmin,13px)] tracking-[0.1em]"
         >
           {/* Each channel sits inside its own brackets — [name] — so the
               row reads as a list of links without a separator between.
@@ -108,11 +107,11 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/10">
-      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-2.5 px-6 py-7 text-center short:py-5 shorter:py-3">
-        <p className="text-[9px] tracking-[0.18em] text-xr-red @sm:text-[11px] @sm:tracking-[0.28em]">
+      <div className="flex w-full flex-col items-center gap-[clamp(0.375rem,1.2vh,0.75rem)] px-[clamp(0.75rem,3vw,3rem)] py-[clamp(0.75rem,2.4vh,2rem)] text-center">
+        <p className="text-[clamp(9px,1.05vmin,12px)] tracking-[clamp(0.16em,0.8vw,0.28em)] text-xr-red">
           ALL THEFT WILL RESULT IN DMCA CONSEQUENCES
         </p>
-        <p className="text-[9px] tracking-[0.24em] text-neutral-500 @sm:text-[10px] @sm:tracking-[0.3em]">
+        <p className="text-[clamp(9px,1vmin,11px)] tracking-[clamp(0.2em,0.9vw,0.3em)] text-neutral-500">
           © 2026 ALL RIGHTS RESERVED
         </p>
       </div>

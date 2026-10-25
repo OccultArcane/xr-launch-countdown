@@ -27,7 +27,7 @@ export const SOCIALS = [
     full: "Instagram",
     href: "https://www.instagram.com/xr.imvu/",
   },
-  { label: "disc", full: "Discord", href: "" },
+  { label: "Disc", full: "Discord", href: "" },
 ];
 
 /**

@@ -7,13 +7,16 @@ import { hasConvex } from "@/lib/convex";
 import { fetchLatestProducts } from "@/lib/productsFeed";
 import { PRODUCTS, SITE, type Product } from "@/lib/store";
 
-/* The link is the hit area, so it holds the width and never moves. */
+/* The link is the hit area, so it holds the width and never moves. The
+   width follows the window's height instead of stepping at a few fixed
+   breakpoints, so the catalog scales with the page continuously and the
+   storefront keeps filling the screen at any size. */
 const TILE_CLASS =
-  "group relative flex w-[144px] flex-col outline-none @xl:w-[156px] short:w-[124px] shorter:w-[108px]";
+  "group relative flex w-[clamp(96px,13vmin,220px)] flex-col outline-none";
 
 /* Everything visible — frame, artwork, price — bumps inside it. */
 const TILE_FRAME_CLASS =
-  "viewfinder flex flex-1 flex-col bg-[#0a0a0a] p-3 transition-[transform,background-color] duration-150 group-hover:bg-white/[0.03] group-focus-visible:bg-white/[0.03] @sm:p-4 short:p-3 short:p-2.5";
+  "viewfinder flex flex-1 flex-col bg-[#0a0a0a] p-[clamp(0.5rem,1.4vmin,1rem)] transition-[transform,background-color] duration-150 group-hover:bg-white/[0.03] group-focus-visible:bg-white/[0.03]";
 
 function Tile({
   product,
@@ -25,7 +28,7 @@ function Tile({
 }) {
   const body = (
     <>
-      <div className="flex items-center justify-between gap-1 text-[8px] uppercase tracking-[0.25em] @sm:text-[9px]">
+      <div className="flex items-center justify-between gap-1 text-[clamp(8px,1vmin,11px)] uppercase tracking-[0.25em]">
         <span className="flex items-center gap-1.5 text-neutral-300">
           <span
             className="blink-dot h-1.5 w-1.5 rounded-full bg-xr-red"
@@ -43,7 +46,7 @@ function Tile({
 
       {/* Image — full tile width at its natural height, never cropped */}
       {product.image && (
-        <div className="mt-3">
+        <div className="mt-[clamp(0.375rem,1.2vmin,0.75rem)]">
           <img
             src={product.image}
             alt={product.name}
@@ -63,13 +66,13 @@ function Tile({
       {/* Name and price are centred under the artwork — the whole tile is
           the link, so no arrow is needed to say it opens something. */}
       <div className="mt-auto min-w-0 text-center">
-        <h3 className="text-[11px] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white @sm:text-[12px]">
+        <h3 className="text-[clamp(11px,1.2vmin,14px)] leading-snug tracking-wide text-neutral-100 transition-colors group-hover:text-white">
           {product.name}
         </h3>
       </div>
 
-      <div className="mt-2.5 flex items-center justify-center border-t border-white/10 pt-2 text-center">
-        <span className="min-w-0 truncate text-[10px] tabular-nums text-neutral-300">
+      <div className="mt-[clamp(0.375rem,1vmin,0.625rem)] flex items-center justify-center border-t border-white/10 pt-[clamp(0.25rem,0.8vmin,0.5rem)] text-center">
+        <span className="min-w-0 truncate text-[clamp(10px,1.05vmin,13px)] tabular-nums text-neutral-300">
           {product.price}
         </span>
       </div>
@@ -116,7 +119,7 @@ function Stack({
   return (
     <div
       className={
-        "grid shrink-0 grid-cols-1 gap-2.5 short:gap-2 shorter:gap-1.5 " +
+        "grid shrink-0 grid-cols-1 gap-[clamp(0.375rem,1.1vmin,0.75rem)] " +
         className
       }
     >
@@ -204,30 +207,33 @@ export function MarkWithProducts({ children }: { children: ReactNode }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="w-full scroll-m-24"
+      className="flex w-full min-h-0 flex-1 flex-col scroll-m-24"
     >
       {feed}
-      <div className="flex w-full flex-col items-center gap-8 @lg:flex-row @lg:items-center @lg:gap-6">
+      <div className="flex w-full min-h-0 flex-1 flex-col items-center gap-[clamp(0.75rem,2.2vmin,2rem)] @lg:h-full @lg:flex-row @lg:items-center">
         {/* Left of the mark bumps left, right of it bumps right, so each
             side moves away from the centre. */}
         {hasProducts && (
-          <Stack items={left} className="order-1 hidden @lg:grid" nudge="left" />
+          <Stack
+            items={left}
+            className="order-1 hidden @lg:grid"
+            nudge="left"
+          />
         )}
 
-        {/* The mark: x's and r's assembling your logo silhouette. It takes
-            whatever height the rest of the page leaves — the header, footer,
-            countdown and the creator row account for roughly 585px, measured
-            in a browser — so the storefront fills the screen instead of
-            floating in it, capped so the mark never grows past the artwork's
-            own size. The floor is where that budget runs out on a short
-            laptop, and the `short:` steps above have already compacted the
-            catalog and chrome by then. */}
-        <div className="order-1 h-[clamp(270px,calc(100dvh_-_585px),560px)] w-full @lg:order-2 @lg:w-auto @lg:flex-1">
+        {/* The mark: x's and r's assembling your logo silhouette. Beside the
+            catalog it takes the row's full height, which the section has
+            already stretched to whatever the header, footer, countdown and
+            creator row leave — so the storefront fills the screen at any
+            window size. Stacked above the catalog (below @lg) it keeps the
+            viewport-based height instead, so it cannot be squeezed to
+            nothing by four tiles underneath it. */}
+        <div className="order-1 h-[clamp(270px,calc(100dvh_-_585px),560px)] w-full @lg:order-2 @lg:h-full @lg:min-h-[180px] @lg:w-auto @lg:flex-1">
           {children}
         </div>
 
         {hasProducts && (
-          <div className="order-2 grid w-fit grid-cols-1 gap-2.5 short:gap-2 @lg:hidden">
+          <div className="order-2 grid w-fit grid-cols-1 gap-[clamp(0.375rem,1.1vmin,0.75rem)] @lg:hidden">
             {products.map((product) => (
               <Tile key={product.id} product={product} />
             ))}

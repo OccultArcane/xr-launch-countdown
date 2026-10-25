@@ -22,12 +22,16 @@ export default function Landing() {
       <div className="flex flex-1 flex-col bg-[#0a0a0a] font-mono text-neutral-100 selection:bg-neutral-100 selection:text-[#0a0a0a]">
         <SiteHeader />
 
-        <main className="flex flex-1 items-center justify-center px-6 py-4 short:py-2.5 shorter:py-1.5">
-          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-6 @sm:gap-8 short:gap-4 shorter:gap-3">
+        <main className="flex min-h-0 flex-1 items-center justify-center px-[clamp(0.75rem,3vw,3rem)] py-[clamp(0.5rem,1.6vh,1.5rem)]">
+          {/* self-stretch + min-h-0: the column takes the height the header
+              and footer leave, and the block below can hand what it doesn't
+              need to the mark — that is what keeps the page filling the
+              window at any size instead of leaving a gap or overflowing. */}
+          <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-[clamp(0.75rem,2.4vh,2rem)] self-stretch">
             <h1 className="sr-only">xr — IMVU storefront</h1>
 
             {/* Mark, catalog and countdown kept tight together */}
-            <div className="flex w-full flex-col items-center gap-6 @sm:gap-8 short:gap-4 shorter:gap-3">
+            <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-[clamp(0.75rem,2.4vh,2rem)]">
               <MarkWithProducts>
                 <BinaryMark
                   text={SITE.maskText}
@@ -38,7 +42,7 @@ export default function Landing() {
                     // Italic slogan in Discord's inactive grey — anchored
                     // under the wordmark and tilting with the mark. The
                     // brand X and R pick up the accent red.
-                    <p className="text-center text-[10px] italic tracking-[0.16em] text-neutral-600 @sm:text-[12px] @sm:tracking-[0.2em]">
+                    <p className="text-center text-[clamp(10px,1.1vmin,14px)] italic tracking-[clamp(0.14em,0.5vw,0.2em)] text-neutral-600">
                       <span className="text-xr-red">X</span>tend your{" "}
                       <span className="text-xr-red">R</span>eality
                     </p>
@@ -51,7 +55,7 @@ export default function Landing() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
-                className="w-full max-w-3xl"
+                className="w-full"
               >
                 <Countdown />
               </motion.div>
@@ -66,13 +70,13 @@ export default function Landing() {
               transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
               className="flex flex-col items-center"
             >
-              <p className="text-[9px] uppercase tracking-[0.32em] text-neutral-500 @sm:text-[10px] @sm:tracking-[0.4em]">
+              <p className="text-[clamp(9px,1.05vmin,12px)] uppercase tracking-[clamp(0.28em,1vw,0.4em)] text-neutral-500">
                 {/* "Shop" carries the same red as the countdown label, the
                     drop date and the DMCA line. */}
                 <span className="text-xr-red">Shop</span> these creators
               </p>
 
-              <div className="mt-2.5 flex flex-wrap items-center justify-center gap-3 @sm:mt-3 @sm:gap-3.5 short:mt-2 short:gap-2.5 shorter:mt-1.5 shorter:gap-2">
+              <div className="mt-[clamp(0.375rem,1.2vh,0.875rem)] flex flex-wrap items-center justify-center gap-[clamp(0.375rem,1vmin,0.875rem)]">
                 {/* The link's box is the hover target, and it never moves: the
                     bump happens on the layer inside it. Sliding the link itself
                     put its edge out from under a cursor sitting on the border,
@@ -86,7 +90,7 @@ export default function Landing() {
                     rel="noopener noreferrer"
                     className="group relative inline-flex outline-none"
                   >
-                    <span className="viewfinder inline-flex items-center gap-2 bg-[#0a0a0a] py-1.5 pr-2.5 pl-1.5 transition-[transform,background-color] duration-150 group-hover:-translate-x-1 group-hover:bg-white/[0.04] short:py-1 short:pr-2 short:pl-1 shorter:py-0.5">
+                    <span className="viewfinder inline-flex items-center gap-[clamp(0.25rem,0.8vmin,0.5rem)] bg-[#0a0a0a] py-[clamp(0.125rem,0.6vh,0.375rem)] pr-[clamp(0.5rem,1vw,0.75rem)] pl-[clamp(0.25rem,0.6vw,0.5rem)] transition-[transform,background-color] duration-150 group-hover:-translate-x-1 group-hover:bg-white/[0.04]">
                       {/* The avatar is decorative — the name beside it is the
                           link's text — so it stays out of the accessibility
                           tree. It is loaded live from IMVU, so a creator's new
@@ -111,12 +115,12 @@ export default function Landing() {
                           img.dataset.fallback = "done";
                           img.src = creator.fallback;
                         }}
-                        className="block h-[72px] w-[52px] shrink-0 object-cover grayscale transition-[filter] duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0 short:h-[56px] short:w-[40px] shorter:h-[44px] shorter:w-[32px]"
+                        className="block h-[clamp(44px,7.5vh,84px)] w-[clamp(32px,5.4vh,60px)] shrink-0 object-cover grayscale transition-[filter] duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0"
                       />
                       {/* The name carries the same red as "Shop" in the label
                           above; the brackets stay neutral so the accent sits on
                           the name alone. */}
-                      <span className="inline-flex items-center whitespace-nowrap text-[12px] tracking-[0.12em] text-xr-red transition-colors group-hover:text-white">
+                      <span className="inline-flex items-center whitespace-nowrap text-[clamp(11px,1.3vmin,15px)] tracking-[0.12em] text-xr-red transition-colors group-hover:text-white">
                         <span aria-hidden="true" className="text-neutral-600">
                           [
                         </span>

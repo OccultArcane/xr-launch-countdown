@@ -52,8 +52,8 @@ export function Countdown() {
   ];
 
   return (
-    <section aria-label="drop countdown" className="w-full max-w-3xl">
-      <div className="mb-5 flex items-baseline justify-between text-[10px] uppercase tracking-[0.35em] short:mb-3 shorter:mb-2">
+    <section aria-label="drop countdown" className="w-full">
+      <div className="mb-[clamp(0.5rem,1.6vh,1.25rem)] flex items-baseline justify-between text-[clamp(10px,1.15vmin,13px)] uppercase tracking-[0.35em]">
         <span className="text-xr-red">
           {dropDay ? "drop day" : "next drop"}
         </span>
@@ -65,14 +65,14 @@ export function Countdown() {
           <div
             key={label}
             className={
-              "px-2 py-6 text-center @sm:py-7 short:py-4 shorter:py-3 " +
+              "px-2 py-[clamp(0.75rem,2.6vh,2rem)] text-center " +
               (index > 0 ? "border-l border-white/10" : "")
             }
           >
-            <div className="text-3xl leading-none tabular-nums text-neutral-100 @sm:text-5xl">
+            <div className="text-[clamp(1.75rem,5vmin,4rem)] leading-none tabular-nums text-neutral-100">
               {pad(value)}
             </div>
-            <div className="mt-3 text-[8px] uppercase tracking-[0.2em] text-neutral-500 @sm:text-[9px] @sm:tracking-[0.3em]">
+            <div className="mt-[clamp(0.25rem,1vh,0.75rem)] text-[clamp(8px,1vmin,11px)] uppercase tracking-[0.2em] text-neutral-500">
               {label}
             </div>
           </div>
