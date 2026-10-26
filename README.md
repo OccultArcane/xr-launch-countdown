@@ -58,6 +58,20 @@ already-open page re-reads the manifest every five minutes — the same rollover
 IMVU's own render — so it catches up within five minutes of that deploy rather than needing a
 reload.
 
+To watch them from your own machine instead of waiting for the schedule, leave this running:
+
+```
+npm run watch-creators                  # every 30 minutes: refresh, commit, push
+npm run watch-creators -- --interval 5  # every 5 minutes
+npm run watch-creators -- --once        # a single pass
+npm run watch-creators -- --dry-run     # refresh only, touch no git state
+```
+
+It commits `public/creators.json` only when a picture actually changed (never empty
+commits) and pushes, which is the deploy; `--no-push` keeps the commit local. It lives only as
+long as that terminal does — for a window-less version, put the same command under cron or
+launchd.
+
 `src/components/CreatorAvatar.tsx` falls back through three sources: that manifest, then
 `image_avatar.php?cid=…` (cache-busted with the rotating `v` token, since IMVU caches it for six
 hours), then the copy in `public/creators/`. Each one is preloaded and only swapped in once it
