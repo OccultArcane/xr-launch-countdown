@@ -108,12 +108,14 @@ async function readExisting() {
 const creators = await readCreators();
 const previous = await readExisting();
 const items = [];
+let refreshed = 0;
 
 for (const { label, id } of creators) {
   const kept = previous.get(id) ?? "";
   try {
     const image = await readPicture(label);
     items.push({ id, image });
+    refreshed += 1;
     const changed = image !== kept;
     console.log(
       `  ok    ${label.padEnd(14)} ${changed ? "updated" : "unchanged"}  ${image}`,
@@ -127,15 +129,22 @@ for (const { label, id } of creators) {
   }
 }
 
-const missing = items.filter((item) => !item.image);
-if (missing.length === items.length) {
+// Nothing read at all means IMVU's pages or their markup moved under us. The
+// pictures already in the file stay (a stale face beats a blank one), but this
+// exits non-zero so the run says so, instead of reporting success over a
+// manifest that has quietly stopped following the creators.
+if (refreshed === 0) {
+  const kept = items.filter((item) => item.image).length;
   console.error(
-    "\nnot one creator picture resolved and there is nothing to keep — leaving public/creators.json alone",
+    kept > 0
+      ? `\nno creator picture could be read this run — keeping the ${kept} already in public/creators.json. IMVU's profile pages may have changed shape.`
+      : "\nno creator picture could be read and there is nothing to keep — leaving public/creators.json alone",
   );
   process.exit(1);
 }
 
 await writeFile(manifest, `${JSON.stringify(items, null, 2)}\n`);
 console.log(
-  `wrote public/creators.json — ${items.length - missing.length} of ${items.length} pictures resolved`,
+  `wrote public/creators.json — ${refreshed} of ${items.length} read now, ` +
+    `${items.length - refreshed} kept from the previous file`,
 );
