@@ -13,7 +13,7 @@
     "format": "prettier --write .",
     "preview": "vite preview",
     "refresh-creators": "node scripts/refresh-creators.mjs",
-    "watch-creators": "node scripts/watch-creators.mjs"
+    "watch": "node scripts/watch.mjs"
   },
   "dependencies": {
     "@convex-dev/auth": "^0.0.90",

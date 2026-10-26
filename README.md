@@ -58,24 +58,40 @@ already-open page re-reads the manifest every five minutes — the same rollover
 IMVU's own render — so it catches up within five minutes of that deploy rather than needing a
 reload.
 
-To watch them from your own machine instead of waiting for the schedule, leave this running:
-
-```
-npm run watch-creators                  # every 30 minutes: refresh, commit, push
-npm run watch-creators -- --interval 5  # every 5 minutes
-npm run watch-creators -- --once        # a single pass
-npm run watch-creators -- --dry-run     # refresh only, touch no git state
-```
-
-It commits `public/creators.json` only when a picture actually changed (never empty
-commits) and pushes, which is the deploy; `--no-push` keeps the commit local. It lives only as
-long as that terminal does — for a window-less version, put the same command under cron or
-launchd.
+To keep this — and the product snapshot — current from your own machine, see "Keeping the
+snapshot fresh from a terminal" below.
 
 `src/components/CreatorAvatar.tsx` falls back through three sources: that manifest, then
 `image_avatar.php?cid=…` (cache-busted with the rotating `v` token, since IMVU caches it for six
 hours), then the copy in `public/creators/`. Each one is preloaded and only swapped in once it
 decodes, so a refresh never blanks the frame.
+
+### Keeping the snapshot fresh from a terminal
+
+Everything on the site that comes from IMVU and changes on its own has a refresh script, and
+`npm run watch` drives all of them — the product snapshot (`public/products.json`) and the
+creators' pictures (`public/creators.json`) today:
+
+```
+npm run watch                    # every 30 minutes: refresh, commit, push
+npm run watch -- --interval 5    # every 5 minutes
+npm run watch -- --once          # a single pass
+npm run watch -- --no-push       # commit, but keep it local
+npm run watch -- --dry-run       # report what changed, touch nothing
+```
+
+A pass runs each refresher, compares its output byte-for-byte, and only when something moved
+does it commit those files and push — which is the deploy. Unchanged passes commit nothing, so
+a quiet night leaves no empty commits; a refresher that cannot reach IMVU leaves its file as it
+is and the others still run. Another auto-updating source is one entry in the `REFRESHERS` list
+at the top of `scripts/watch.mjs`: the script to run, and the files it writes.
+
+The watcher lives only as long as that terminal does. For a window-less version, put the same
+command under cron or launchd — e.g. every 30 minutes:
+
+```
+*/30 * * * * cd /path/to/xr-launch-countdown && npm run watch -- --once >> /tmp/watch.log 2>&1
+```
 
 ### Publishing it
 
