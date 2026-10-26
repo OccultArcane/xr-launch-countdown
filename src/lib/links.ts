@@ -63,3 +63,6 @@ export const SUPPORTED_CREATORS = CREATORS.map((creator) => ({
   image: creatorAvatarUrl(creator.id),
   fallback: asset(`creators/${creator.avatar}`),
 }));
+
+/** One entry of that row, as the landing page and its avatar render it. */
+export type Creator = (typeof SUPPORTED_CREATORS)[number];

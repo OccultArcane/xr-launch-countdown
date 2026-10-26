@@ -6,6 +6,11 @@ name: Deploy storefront to GitHub Pages
 on:
   push:
     branches: [main]
+  # Rebuild on its own every six hours: the build re-reads the creators'
+  # profile pictures (and the shop snapshot) from IMVU, so the row follows
+  # a creator's new avatar without waiting for the next push.
+  schedule:
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -34,6 +39,13 @@ jobs:
       # unreachable must not stop the deploy — the committed products.json
       # is used as-is in that case.
       - run: npm run refresh-products
+        continue-on-error: true
+
+      # Same for the creators row's pictures: their profile pictures are
+      # uploads whose URLs change on every new picture, so they are read from
+      # IMVU here rather than built from an id. The committed creators.json
+      # stands when IMVU is unreachable.
+      - run: npm run refresh-creators
         continue-on-error: true
 
       - run: npm run build:pages

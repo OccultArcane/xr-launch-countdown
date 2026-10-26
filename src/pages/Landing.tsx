@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { BinaryMark } from "@/components/BinaryMark";
 import { Countdown } from "@/components/Countdown";
+import { CreatorAvatar } from "@/components/CreatorAvatar";
 import { MarkWithProducts } from "@/components/ProductsSection";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { Stage } from "@/components/Stage";
@@ -91,32 +92,11 @@ export default function Landing() {
                     className="group relative inline-flex outline-none"
                   >
                     <span className="viewfinder inline-flex items-center gap-[clamp(0.25rem,0.8vmin,0.5rem)] bg-[#0a0a0a] py-[clamp(0.125rem,0.6vh,0.375rem)] pr-[clamp(0.5rem,1vw,0.75rem)] pl-[clamp(0.25rem,0.6vw,0.5rem)] transition-[transform,background-color] duration-150 group-hover:-translate-x-1 group-hover:bg-white/[0.04]">
-                      {/* The avatar is decorative — the name beside it is the
-                          link's text — so it stays out of the accessibility
-                          tree. It is loaded live from IMVU, so a creator's new
-                          avatar shows up on its own; the copy in public/ stands
-                          in only when that request fails. Muted by default, in
-                          colour on hover/focus. */}
-                      <img
-                        src={creator.image}
-                        alt=""
-                        width={52}
-                        height={72}
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                        onError={(event) => {
-                          const img = event.currentTarget;
-                          if (img.dataset.fallback === "done") {
-                            // IMVU unreachable and no local copy either — drop
-                            // the frame rather than show a broken-image glyph.
-                            img.style.visibility = "hidden";
-                            return;
-                          }
-                          img.dataset.fallback = "done";
-                          img.src = creator.fallback;
-                        }}
-                        className="block h-[clamp(44px,7.5vh,84px)] w-[clamp(32px,5.4vh,60px)] shrink-0 object-cover grayscale transition-[filter] duration-300 group-hover:grayscale-0 group-focus-visible:grayscale-0"
-                      />
+                      {/* Decorative — the name beside it is the link's
+                          text — and kept current with IMVU on its own, so a
+                          creator's new picture lands without a rebuild (see
+                          CreatorAvatar). */}
+                      <CreatorAvatar creator={creator} />
                       {/* The name carries the same red as "Shop" in the label
                           above; the brackets stay neutral so the accent sits on
                           the name alone. */}

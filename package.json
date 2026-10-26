@@ -11,7 +11,8 @@
     "refresh-products": "node scripts/refresh-products.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "refresh-creators": "node scripts/refresh-creators.mjs"
   },
   "dependencies": {
     "@convex-dev/auth": "^0.0.90",

@@ -37,6 +37,32 @@ The tiles fall through three layers, in this order:
    reached when `SITE.productsApi` is set to `""`; that needs a deployment (`npx convex dev`)
    and its `VITE_CONVEX_URL`.
 
+### Creator avatars
+
+Each creator in the row shows the profile picture they have uploaded to IMVU, so an animated
+GIF arrives animated and at full size (160×220) rather than as the blurry 80×110 still
+`image_avatar.php` answers with. Those uploads carry a hash in their file name that changes
+whenever the creator uploads a new picture, so the URL cannot be built from their id: it is
+read from the `og:image` of their profile page by `npm run refresh-creators`
+(`scripts/refresh-creators.mjs`), which writes `public/creators.json`.
+
+A browser cannot do that lookup itself — IMVU sends no CORS header, so its profile pages are
+unreadable from the storefront — which is why the deploy workflow runs the refresh before every
+build and, on a six-hour schedule, on its own. Any push or scheduled run therefore republishes
+the row with whatever pictures the creators have by then, and a creator whose page cannot be
+read keeps the picture already in the file rather than going blank.
+
+How quickly a new picture lands: the manifest is only as current as the last build, so a picture
+uploaded now shows up at the next scheduled rebuild (within six hours) or at the next push. An
+already-open page re-reads the manifest every five minutes — the same rollover that cache-busts
+IMVU's own render — so it catches up within five minutes of that deploy rather than needing a
+reload.
+
+`src/components/CreatorAvatar.tsx` falls back through three sources: that manifest, then
+`image_avatar.php?cid=…` (cache-busted with the rotating `v` token, since IMVU caches it for six
+hours), then the copy in `public/creators/`. Each one is preloaded and only swapped in once it
+decodes, so a refresh never blanks the frame.
+
 ### Publishing it
 
 * `npm run build` — normal root-relative build for any host, including the Freebuff preview.
