@@ -49,12 +49,12 @@ read from the `og:image` of their profile page by `npm run refresh-creators`
 
 A browser cannot do that lookup itself — IMVU sends no CORS header, so its profile pages are
 unreadable from the storefront — which is why the deploy workflow runs the refresh before every
-build and, on a six-hour schedule, on its own. Any push or scheduled run therefore republishes
+build and, on an hourly schedule, on its own. Any push or scheduled run therefore republishes
 the row with whatever pictures the creators have by then, and a creator whose page cannot be
 read keeps the picture already in the file rather than going blank.
 
 How quickly a new picture lands: the manifest is only as current as the last build, so a picture
-uploaded now shows up at the next scheduled rebuild (within six hours) or at the next push. An
+uploaded now shows up at the next scheduled rebuild (within an hour) or at the next push. An
 already-open page re-reads the manifest every five minutes — the same rollover that cache-busts
 IMVU's own render — so it catches up within five minutes of that deploy rather than needing a
 reload.

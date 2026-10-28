@@ -6,11 +6,12 @@ name: Deploy storefront to GitHub Pages
 on:
   push:
     branches: [main]
-  # Rebuild on its own every six hours: the build re-reads the creators'
-  # profile pictures (and the shop snapshot) from IMVU, so the row follows
-  # a creator's new avatar without waiting for the next push.
+  # Rebuild on its own every hour: the build re-reads the creators' profile
+  # pictures (and the shop snapshot) from IMVU, so the row follows a creator's
+  # new avatar without waiting for the next push. :17 rather than :00 keeps it
+  # out of the slot every other scheduled job on GitHub asks for.
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:

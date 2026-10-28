@@ -7,7 +7,7 @@
       upload, so it animates when theirs is a GIF and is sharper than the
       render IMVU serves by id. `scripts/refresh-creators.mjs` keeps the
       manifest current at build time (the deploy workflow refreshes it and
-      rebuilds every six hours); the picture's file name carries a hash, so a
+      rebuilds every hour); the picture's file name carries a hash, so a
       new upload is a new URL and the old one can never linger. The manifest
       is re-read on the same rollover as the token below, so a page left open
       picks up whatever the last deploy published.
