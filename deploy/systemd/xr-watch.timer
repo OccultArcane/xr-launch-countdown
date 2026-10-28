@@ -1,0 +1,25 @@
+# Runs xr-watch.service every 30 minutes. See the service file for how to
+# install both.
+#
+#   systemctl --user list-timers xr-watch.timer    next run and last run
+#   systemctl --user start xr-watch.service        one pass right now
+#   journalctl --user -u xr-watch -n 40 -f         what the passes did
+#
+# A user timer only counts down while your systemd user instance is running.
+# On a desktop that is every login; on a server it stops at logout unless you
+# enable lingering — `loginctl enable-linger "$USER"` — which starts the
+# instance at boot and keeps it after you disconnect.
+
+[Unit]
+Description=Run the storefront watcher every 30 minutes
+
+[Timer]
+# The schedule: on the clock with catch-up after sleep when the interval
+# divides an hour, boot-relative otherwise. `npm run schedule` rewrites the
+# two lines below for the interval you ask for; by hand, edit them yourself.
+OnCalendar=*:0/30
+Persistent=true
+Unit=xr-watch.service
+
+[Install]
+WantedBy=timers.target

@@ -1,6 +1,7 @@
 ## Overview
 
 This project uses the following tech stack:
+
 - Vite
 - Typescript
 - React Router v7 (all imports from `react-router` instead of `react-router-dom`)
@@ -87,21 +88,98 @@ is and the others still run. Another auto-updating source is one entry in the `R
 at the top of `scripts/watch.mjs`: the script to run, and the files it writes.
 
 The watcher lives only as long as that terminal does. For a window-less version, put the same
-command under cron or launchd — e.g. every 30 minutes:
+command under a scheduler — e.g. cron, every 30 minutes:
 
 ```
 */30 * * * * cd /path/to/xr-launch-countdown && npm run watch -- --once >> /tmp/watch.log 2>&1
 ```
 
+On a systemd machine, `deploy/systemd/` holds a user service and timer that do the same thing
+and keep the output in the journal rather than a log file:
+
+```
+mkdir -p ~/.config/systemd/user
+cp deploy/systemd/xr-watch.* ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now xr-watch.timer
+```
+
+```
+systemctl --user list-timers xr-watch.timer     # next run, last run
+systemctl --user start xr-watch.service         # one pass now, without waiting
+journalctl --user -u xr-watch -n 40 -f          # what the passes did
+systemctl --user disable --now xr-watch.timer   # stop the schedule
+```
+
+The units assume the clone is `~/xr-launch-countdown` (`%h` in a unit is your home directory)
+and that node is in `/usr/local/bin` or `/usr/bin`; a clone elsewhere needs `WorkingDirectory`
+and `Documentation` edited, and an nvm- or volta-managed node needs the `ExecStart` path
+swapped for the output of `which node`. The timer fires at `:00` and `:30` with
+`Persistent=true`, so a pass missed while the machine was asleep or off runs once at the next
+boot rather than being skipped.
+
+On macOS the same schedule is a LaunchAgent, `deploy/launchd/com.xr-launch-countdown.watch.plist`.
+Copy it into `~/Library/LaunchAgents/` after replacing the two `/Users/YOU/…` paths and the
+`/opt/homebrew/bin/node` it runs — or let `npm run schedule` write the filled-in copy:
+
+```
+cp deploy/launchd/com.xr-launch-countdown.watch.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.xr-launch-countdown.watch.plist
+launchctl print gui/$(id -u)/com.xr-launch-countdown.watch | head -20
+tail -f ~/Library/Logs/xr-watch.log
+launchctl bootout gui/$(id -u)/com.xr-launch-countdown.watch    # stop and remove it
+```
+
+A LaunchAgent only runs while you are logged in, and `StartInterval` counts from the last run
+rather than from the clock — a sleeping Mac catches up on waking instead of firing exactly on
+the half hour.
+
+`npm run schedule` does all of that on whichever scheduler the machine actually has — launchd
+on macOS, a systemd user timer on Linux when a user instance answers, cron otherwise:
+
+```
+npm run schedule                      # install and enable, every 30 minutes
+npm run schedule -- --interval 5      # every 5 minutes
+npm run schedule -- --status          # installed? when does it next run?
+npm run schedule -- --uninstall       # take the schedule back off
+npm run schedule -- --dry-run         # print what it would write, change nothing
+npm run schedule -- --scheduler cron  # override the detection
+npm run schedule -- --linger          # systemd: keep it running with no session
+```
+
+It bakes in this clone's absolute path and the node binary that ran the script, which is the
+part a hand-copied crontab gets wrong: a scheduled job has no shell profile, so an
+nvm-installed `node` — and `npm` itself — are invisible to it. The systemd units and the plist
+it writes are rendered from `deploy/systemd/` and `deploy/launchd/`, so every key has one home.
+
+A **user** timer only counts down while your systemd user instance is running: on a desktop
+that is every login, but on a server it stops at logout. Enabling lingering starts that
+instance at boot and keeps it running with no session at all:
+
+```
+loginctl enable-linger "$USER"
+loginctl show-user "$USER" --property=Linger     # Linger=yes
+```
+
+It needs no root for your own account on most distributions (polkit may ask for
+confirmation); `sudo loginctl enable-linger "$USER"` works either way, and
+`loginctl disable-linger "$USER"` undoes it. Use the timer **or** cron, not both — a second
+schedule over the same clone duplicates the refresh and can collide on git's index lock.
+
+Git credentials are the one thing a scheduler cannot supply: there is no unlocked keychain
+prompt and no SSH passphrase prompt, so the push has to work unattended already —
+`gh auth setup-git` or a passphrase-less deploy key. `git push` failing there leaves the
+commit on disk and says so in the journal; the next pass pushes both.
+
 ### Publishing it
 
-* `npm run build` — normal root-relative build for any host, including the Freebuff preview.
-* `npm run build:pages` — builds for GitHub Pages at `/<repo>/` and writes `dist/404.html`,
+- `npm run build` — normal root-relative build for any host, including the Freebuff preview.
+- `npm run build:pages` — builds for GitHub Pages at `/<repo>/` and writes `dist/404.html`,
   so deep links such as `/<repo>/products/76161696` boot the app instead of 404ing. It first
   runs `npm run check-creators`, which fails the build when a supported creator's live IMVU
   avatar no longer resolves — an unknown id answers with IMVU's placeholder picture, so the
   response is hashed and compared against it rather than trusted on status alone.
-* `.github/workflows/deploy-pages.yml` — runs both on every push to `main` and deploys.
+- `.github/workflows/deploy-pages.yml` — runs both on every push to `main` and deploys.
   Enable it once under Settings → Pages → Build and deployment → Source: GitHub Actions.
 
 Every public asset and internal link resolves through `src/lib/asset.ts`
@@ -122,7 +200,6 @@ The project is set up with project specific CONVEX_DEPLOYMENT and VITE_CONVEX_UR
 The convex server has a separate set of environment variables that are accessible by the convex backend.
 
 Currently, these variables include auth-specific keys: JWKS, JWT_PRIVATE_KEY, and SITE_URL.
-
 
 # Using Authentication (Important!)
 
@@ -145,6 +222,7 @@ On the `src/convex/users.ts` file, you can use the `getCurrentUser` function to 
 The `/auth` page is already set up to use auth. Navigate to `/auth` for all log in / sign up sequences.
 
 You MUST use this hook to get user data. Never do this yourself without the hook:
+
 ```typescript
 import { useAuth } from "@/hooks/use-auth";
 
@@ -224,6 +302,7 @@ When adding a page, update the react router configuration in `src/main.tsx` to i
 ## Shad CN conventions
 
 Follow these conventions when using Shad CN components, which you should use by default.
+
 - Remember to use "cursor-pointer" to make the element clickable
 - For title text, use the "tracking-tight font-bold" class to make the text more readable
 - Always make apps MOBILE RESPONSIVE. This is important
@@ -231,10 +310,10 @@ Follow these conventions when using Shad CN components, which you should use by 
 - AVOID SHADOWS. Avoid adding any shadows to components. stick with a thin border without the shadow.
 - Avoid skeletons; instead, use the loader2 component to show a spinning loading state when loading data.
 
-
 ## Landing Pages
 
-You must always create good-looking designer-level styles to your application. 
+You must always create good-looking designer-level styles to your application.
+
 - Make it well animated and fit a certain "theme", ie neo brutalist, retro, neumorphism, glass morphism, etc
 
 Use known images and emojis from online.
@@ -257,8 +336,8 @@ You must add animations to components using Framer Motion. It is already install
 
 To use it, import the `motion` component from `framer-motion` and use it to wrap the component you want to animate.
 
-
 ### Other Items to animate
+
 - Fade in and Fade Out
 - Slide in and Slide Out animations
 - Rendering animations
@@ -269,7 +348,6 @@ Animate for all components, including on landing page and app pages.
 ## Three JS Graphics
 
 Your app comes with three js by default. You can use it to create 3D graphics for landing pages, games, etc.
-
 
 ## Colors
 
@@ -329,7 +407,7 @@ Remember to import { toast } from "sonner". Usage: `toast("Event has been create
 
 Always ensure your larger dialogs have a scroll in its content to ensure that its content fits the screen size. Make sure that the content is not cut off from the screen.
 
-Ideally, instead of using a new page, use a Dialog instead. 
+Ideally, instead of using a new page, use a Dialog instead.
 
 # Using the Convex backend
 
@@ -343,7 +421,6 @@ The schema is defined in `src/convex/schema.ts`.
 
 Do not include the `_id` and `_creationTime` fields in your queries (it is included by default for each table).
 Do not index `_creationTime` as it is indexed for you. Never have duplicate indexes.
-
 
 ## Convex Actions: Using CRUD operations
 
@@ -371,10 +448,10 @@ await ctx.runMutation(internal.users.update, {
 });
 ```
 
-
 ## Common Convex Mistakes To Avoid
 
 When using convex, make sure:
+
 - Document IDs are referenced as `_id` field, not `id`.
 - Document ID types are referenced as `Id<"TableName">`, not `string`.
 - Document object types are referenced as `Doc<"TableName">`.

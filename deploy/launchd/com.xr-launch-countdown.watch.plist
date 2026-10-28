@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  The storefront watcher as a macOS LaunchAgent: one pass of
+  scripts/watch.mjs every 30 minutes, committing and pushing whatever changed.
+
+  Install by hand from the repository root, after editing the two
+  /Users/YOU/… paths and the node path (`which node`). `npm run schedule`
+  writes this same file with all of them already filled in, which is easier:
+
+    mkdir -p ~/Library/LaunchAgents ~/Library/Logs
+    cp deploy/launchd/com.xr-launch-countdown.watch.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.xr-launch-countdown.watch.plist
+    launchctl print gui/$(id -u)/com.xr-launch-countdown.watch | head -20
+    tail -f ~/Library/Logs/xr-watch.log
+
+  Stop and remove it with:
+
+    launchctl bootout gui/$(id -u)/com.xr-launch-countdown.watch
+    rm ~/Library/LaunchAgents/com.xr-launch-countdown.watch.plist
+
+  Like the systemd unit: launchd gives an agent no shell profile, so the
+  paths are absolute and bash -lc is explicit; exec leaves the PID on node
+  rather than on bash; and the agent runs only while you are logged in,
+  firing within StartInterval of waking rather than exactly on the half hour.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.xr-launch-countdown.watch</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-lc</string>
+    <string>cd /Users/YOU/xr-launch-countdown &amp;&amp; exec /opt/homebrew/bin/node scripts/watch.mjs --once</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/YOU/xr-launch-countdown</string>
+  <key>StartInterval</key>
+  <integer>1800</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/YOU/Library/Logs/xr-watch.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/YOU/Library/Logs/xr-watch.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+</dict>
+</plist>

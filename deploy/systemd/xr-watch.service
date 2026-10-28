@@ -1,0 +1,45 @@
+# One pass of the storefront watcher, started by xr-watch.timer.
+#
+# The same work as `npm run watch -- --once`: refresh the product snapshot and
+# the creators' pictures from IMVU, then commit and push whatever actually
+# changed — the push is the deploy. Node is called directly instead of through
+# npm because a unit gets no shell profile, so npm (and an nvm-installed node)
+# would not be on PATH.
+#
+# Install, from the repository root:
+#
+#   mkdir -p ~/.config/systemd/user
+#   cp deploy/systemd/xr-watch.* ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now xr-watch.timer
+#
+# Paths assume the clone is ~/xr-launch-countdown: %h is your home directory,
+# so a clone elsewhere means editing WorkingDirectory and Documentation. Swap
+# `/usr/bin/env node` for the output of `which node` when node is not in
+# /usr/local/bin or /usr/bin (nvm, volta and asdf each keep their own).
+
+[Unit]
+Description=Refresh the storefront's IMVU products and creator pictures
+Documentation=file:%h/xr-launch-countdown/README.md
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/xr-launch-countdown
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+# There is no terminal to prompt at: a push that needs a password should fail
+# with a reason in the journal rather than hang until the next timer tick.
+Environment=GIT_TERMINAL_PROMPT=0
+ExecStart=/usr/bin/env node scripts/watch.mjs --once
+
+# A pass takes seconds. Bounding it means a stalled request fails the unit
+# instead of leaving a copy running while the timer starts another.
+TimeoutStartSec=10min
+
+# Housekeeping, not foreground work.
+Nice=10
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=xr-watch
